@@ -1,0 +1,16 @@
+{
+  "name": "luxora-ecommerce",
+  "version": "1.0.0",
+  "description": "Luxora Premium Perfume E-commerce Store",
+  "scripts": {
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "start": "concurrently \"cd backend && npm start\" \"cd frontend && npm run dev\"",
+    "seed": "cd backend && npm run seed"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.1"
+  }
+}
