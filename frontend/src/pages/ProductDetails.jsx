@@ -4,7 +4,6 @@ import { getProduct } from '../api/products';
 import { useCart } from '../context/CartContext';
 import Loading from '../components/Loading';
 import { HiStar, HiShoppingBag, HiShieldCheck, HiTruck, HiClock, HiArrowLeft } from 'react-icons/hi';
-import './ProductDetails.css';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -29,111 +28,106 @@ const ProductDetails = () => {
 
   if (loading) return <Loading fullPage />;
   if (!product) return (
-    <div className="container section pt-nav text-center">
-      <h2>Product not found</h2>
-      <Link to="/shop" className="btn btn-primary mt-20">Back to Shop</Link>
+    <div className="container mx-auto px-6 py-32 text-center">
+      <h2 className="text-2xl font-bold text-white mb-6">Product not found</h2>
+      <Link to="/shop" className="btn btn-primary">Back to Shop</Link>
     </div>
   );
 
   return (
-    <div className="product-details-page pt-nav animate-fade-in">
-      <div className="container section">
-        <Link to="/shop" className="back-link">
-          <HiArrowLeft /> Back to Shop
+    <div className="bg-[#0a0a0f] min-h-screen pt-24 animate-fade-in">
+      <div className="container mx-auto px-6 py-12">
+        <Link to="/shop" className="flex items-center gap-2 text-[#7a6e8a] hover:text-[#f0e6ff] transition-all mb-10 w-fit group">
+          <HiArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Back to Shop
         </Link>
         
-        <div className="details-grid">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           {/* Main Image */}
-          <div className="product-visuals">
-            <div className="main-image-wrapper glass-card">
-              <img src={product.image} alt={product.name} className="main-image" />
-              {product.featured && <span className="badge badge-gold detail-badge">Featured Selection</span>}
+          <div className="flex flex-col gap-6">
+            <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-card border border-[rgba(155,89,182,0.15)] flex items-center justify-center p-12 group shadow-2xl">
+              <img src={product.image} alt={product.name} className="max-w-full max-h-full object-contain transform group-hover:scale-110 transition-transform duration-700" />
+              {product.featured && <span className="absolute top-6 left-6 bg-[#c9a96e]/15 text-[#c9a96e] border border-[#c9a96e]/30 px-4 py-1.5 rounded-full text-[0.8rem] font-bold uppercase tracking-widest backdrop-blur-md">Featured Selection</span>}
             </div>
-            {/* Minimal Mock thumbnails */}
-            <div className="thumbnails-row">
-              <div className="thumbnail active glass-card"><img src={product.image} alt="th" /></div>
-              <div className="thumbnail glass-card"><img src={product.image} alt="th" style={{ opacity: 0.6 }} /></div>
-              {/* Other mock variations could go here */}
+            {/* Thumbnails row */}
+            <div className="grid grid-cols-4 gap-4">
+              <div className="aspect-square rounded-xl overflow-hidden border-2 border-[#6a0dad] bg-[#16162a] p-2 flex items-center justify-center">
+                <img src={product.image} alt="th" className="max-w-full max-h-full object-contain" />
+              </div>
+              <div className="aspect-square rounded-xl overflow-hidden border border-[rgba(155,89,182,0.15)] bg-[#16162a] p-2 flex items-center justify-center opacity-40 hover:opacity-100 transition-opacity cursor-pointer">
+                <img src={product.image} alt="th" className="max-w-full max-h-full object-contain" />
+              </div>
             </div>
           </div>
           
           {/* Content */}
-          <div className="product-content">
-            <div className="content-header">
-              <p className="detail-brand">{product.brand}</p>
-              <h1 className="detail-name">{product.name}</h1>
-              <div className="detail-rating">
-                <div className="stars">
+          <div className="flex flex-col h-full">
+            <div className="mb-8">
+              <p className="text-[#6a0dad] font-bold uppercase tracking-[4px] text-sm mb-3 font-luxury">{product.brand}</p>
+              <h1 className="font-['Playfair_Display'] text-4xl md:text-5xl font-extrabold text-[#f0e6ff] mb-4 leading-tight">{product.name}</h1>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-1.5 text-[#c9a96e]">
                   {[...Array(5)].map((_, i) => (
-                    <HiStar key={i} className={i < Math.floor(product.rating) ? 'star-filled' : 'star-empty'} />
+                    <HiStar key={i} className={i < Math.floor(product.rating) ? 'text-xl text-[#c9a96e]' : 'text-xl text-[#c9a96e] opacity-20'} />
                   ))}
                 </div>
-                <span>{product.rating} / 5.0</span>
-                <span className="divider">•</span>
-                <span>{product.numReviews} Reviews</span>
+                <div className="flex items-center gap-3 text-sm text-[#7a6e8a] font-medium border-l border-[rgba(155,89,182,0.15)] pl-6">
+                  <span className="text-[#f0e6ff]">{product.rating} / 5.0</span>
+                  <span className="opacity-30">•</span>
+                  <span>{product.numReviews} Reviews</span>
+                </div>
               </div>
             </div>
             
-            <div className="detail-price-row">
-              <p className="detail-price">${product.price.toFixed(2)}</p>
-              <span className="badge badge-purple">{product.volume}</span>
+            <div className="flex items-center gap-6 mb-8">
+              <p className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">${product.price.toFixed(2)}</p>
+              <span className="bg-[#6a0dad]/20 text-[#d4a5ff] border border-[#6a0dad]/30 px-4 py-1.5 rounded-full text-[0.85rem] font-bold tracking-wider">{product.volume}</span>
             </div>
             
-            <p className="detail-description">{product.description}</p>
+            <p className="text-[#b8a9cc] text-lg leading-[1.8] mb-10 pb-8 border-b border-[rgba(155,89,182,0.1)]">{product.description}</p>
             
-            <div className="detail-selection">
-              <div className="qty-picker glass-card">
+            <div className="flex flex-col sm:flex-row gap-6 mb-12">
+              <div className="flex items-center h-[56px] px-6 bg-[#16162a] border border-[rgba(155,89,182,0.15)] rounded-full gap-8 w-fit mx-auto sm:mx-0">
                 <button 
-                  className="qty-btn" 
+                  className="text-[#b8a9cc] text-2xl hover:text-[#f0e6ff] disabled:opacity-20 transition-all" 
                   onClick={() => setQuantity(q => Math.max(1, q - 1))}
                   disabled={quantity <= 1}
                 >-</button>
-                <span className="qty-value">{quantity}</span>
+                <span className="text-xl font-bold text-[#f0e6ff] min-w-[20px] text-center">{quantity}</span>
                 <button 
-                  className="qty-btn" 
+                  className="text-[#b8a9cc] text-2xl hover:text-[#f0e6ff] disabled:opacity-20 transition-all font-bold" 
                   onClick={() => setQuantity(q => q + 1)}
                   disabled={quantity >= product.stock}
                 >+</button>
               </div>
               
               <button 
-                className="btn btn-primary btn-lg flex-1 grow"
+                className="btn btn-primary flex-1 h-[56px] text-lg gap-3"
                 onClick={() => addToCart(product, quantity)}
                 disabled={product.stock === 0}
               >
-                <HiShoppingBag /> {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                <HiShoppingBag className="text-2xl" /> {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
               </button>
             </div>
             
             {/* Features Info */}
-            <div className="trust-grid glass-card p-24">
-              <div className="trust-item">
-                <HiShieldCheck className="trust-icon" />
-                <div className="trust-text">
-                  <h5>Genuine Guarantee</h5>
-                  <p>100% authentic designer fragrances.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 bg-gradient-card border border-[rgba(155,89,182,0.15)] rounded-2xl mb-10">
+              {[
+                { icon: <HiShieldCheck />, title: 'Genuine Guarantee', desc: '100% authentic designer fragrances.' },
+                { icon: <HiTruck />, title: 'Express Shipping', desc: 'Free priority shipping on all orders.' },
+                { icon: <HiClock />, title: 'Lasting Quality', desc: 'Long-wear formula tested for 8h+ projection.' }
+              ].map((item, idx) => (
+                <div key={idx} className="flex flex-col items-center md:items-start text-center md:text-left gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-[#6a0dad]/10 flex items-center justify-center text-[#d4a5ff] text-2xl mb-2">{item.icon}</div>
+                  <h5 className="text-[#f0e6ff] font-bold text-sm">{item.title}</h5>
+                  <p className="text-[#7a6e8a] text-[0.75rem] leading-snug">{item.desc}</p>
                 </div>
-              </div>
-              <div className="trust-item">
-                <HiTruck className="trust-icon" />
-                <div className="trust-text">
-                  <h5>Express Shipping</h5>
-                  <p>Free priority shipping on all orders.</p>
-                </div>
-              </div>
-              <div className="trust-item">
-                <HiClock className="trust-icon" />
-                <div className="trust-text">
-                  <h5>Lasting Quality</h5>
-                  <p>Long-wear formula tested for 8h+ projection.</p>
-                </div>
-              </div>
+              ))}
             </div>
             
-            <div className="product-meta-extra">
-              <p><span>Category:</span> {product.category}</p>
-              <p><span>Inventory:</span> {product.stock > 10 ? 'In Stock' : product.stock > 0 ? `Only ${product.stock} left` : 'Sold Out'}</p>
-              <p><span>SKU:</span> LX-{product._id.slice(-6).toUpperCase()}</p>
+            <div className="flex flex-wrap gap-x-12 gap-y-4 text-sm mt-auto py-6 border-t border-[rgba(155,89,182,0.1)]">
+              <p className="flex items-center gap-3 font-semibold text-[#7a6e8a]"><span className="text-[#f0e6ff]">Category:</span> {product.category}</p>
+              <p className="flex items-center gap-3 font-semibold text-[#7a6e8a]"><span className="text-[#f0e6ff]">Inventory:</span> {product.stock > 10 ? 'In Stock' : product.stock > 0 ? `Only ${product.stock} left` : 'Sold Out'}</p>
+              <p className="flex items-center gap-3 font-semibold text-[#7a6e8a]"><span className="text-[#f0e6ff]">SKU:</span> LX-{product._id.slice(-6).toUpperCase()}</p>
             </div>
           </div>
         </div>

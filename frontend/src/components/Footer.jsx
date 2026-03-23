@@ -1,75 +1,97 @@
 import { Link } from 'react-router-dom';
 import { HiHeart } from 'react-icons/hi';
 import { FaFacebookF, FaInstagram, FaTwitter, FaPinterestP } from 'react-icons/fa';
-import './Footer.css';
 
 const Footer = () => {
   return (
-    <footer className="footer">
-      <div className="footer-glow"></div>
-      <div className="container">
-        <div className="footer-grid">
+    <footer className="relative bg-[#0a0a0f] pt-20 pb-10 border-t border-[rgba(155,89,182,0.1)] overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#6a0dad]/10 blur-[100px] rounded-full pointer-events-none"></div>
+      
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand */}
-          <div className="footer-brand">
-            <Link to="/" className="footer-logo">
-              <span className="logo-icon">✦</span>
-              <span>LUXORA</span>
+          <div className="flex flex-col gap-6">
+            <Link to="/" className="flex items-center gap-[10px] font-luxury text-2xl font-bold tracking-[3px] text-[#f0e6ff] hover:text-[#d4a5ff] transition-all group w-fit">
+              <span className="text-[1.3rem] animate-float bg-gradient-primary bg-clip-text text-transparent group-hover:scale-110 transition-transform">✦</span>
+              <span className="font-['Playfair_Display']">LUXORA</span>
             </Link>
-            <p className="footer-tagline">
+            <p className="text-[#7a6e8a] text-sm leading-relaxed max-w-[280px]">
               Discover the art of fine fragrance. Curated luxury perfumes 
               for the discerning individual.
             </p>
-            <div className="footer-socials">
-              <a href="#" className="social-icon" aria-label="Facebook"><FaFacebookF /></a>
-              <a href="#" className="social-icon" aria-label="Instagram"><FaInstagram /></a>
-              <a href="#" className="social-icon" aria-label="Twitter"><FaTwitter /></a>
-              <a href="#" className="social-icon" aria-label="Pinterest"><FaPinterestP /></a>
+            <div className="flex items-center gap-4">
+              {[
+                { icon: <FaFacebookF />, label: 'Facebook' },
+                { icon: <FaInstagram />, label: 'Instagram' },
+                { icon: <FaTwitter />, label: 'Twitter' },
+                { icon: <FaPinterestP />, label: 'Pinterest' }
+              ].map((social, idx) => (
+                <a 
+                  key={idx}
+                  href="#" 
+                  className="w-10 h-10 rounded-full bg-[#16162a] border border-[rgba(155,89,182,0.15)] flex items-center justify-center text-[#b8a9cc] hover:bg-[#6a0dad] hover:text-white hover:border-[#6a0dad] transition-all" 
+                  aria-label={social.label}
+                >
+                  {social.icon}
+                </a>
+              ))}
             </div>
           </div>
 
           {/* Quick Links */}
-          <div className="footer-column">
-            <h4 className="footer-heading">Quick Links</h4>
-            <ul className="footer-links">
-              <li><Link to="/">Home</Link></li>
-              <li><Link to="/shop">Shop All</Link></li>
-              <li><Link to="/shop?category=Women">Women</Link></li>
-              <li><Link to="/shop?category=Men">Men</Link></li>
-              <li><Link to="/shop?category=Unisex">Unisex</Link></li>
+          <div>
+            <h4 className="text-[#f0e6ff] font-bold text-sm uppercase tracking-widest mb-6 border-l-2 border-[#6a0dad] pl-4">Quick Links</h4>
+            <ul className="flex flex-col gap-3">
+              {[
+                { to: '/', label: 'Home' },
+                { to: '/shop', label: 'Shop All' },
+                { to: '/shop?category=Women', label: 'Women' },
+                { to: '/shop?category=Men', label: 'Men' },
+                { to: '/shop?category=Unisex', label: 'Unisex' }
+              ].map((link, idx) => (
+                <li key={idx}>
+                  <Link to={link.to} className="text-[#7a6e8a] text-sm hover:text-[#f0e6ff] transition-all hover:translate-x-1 inline-block">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Company */}
-          <div className="footer-column">
-            <h4 className="footer-heading">Company</h4>
-            <ul className="footer-links">
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Contact</a></li>
-              <li><a href="#">Careers</a></li>
-              <li><a href="#">Press</a></li>
+          <div>
+            <h4 className="text-[#f0e6ff] font-bold text-sm uppercase tracking-widest mb-6 border-l-2 border-[#6a0dad] pl-4">Company</h4>
+            <ul className="flex flex-col gap-3">
+              {['About Us', 'Contact', 'Careers', 'Press'].map((item, idx) => (
+                <li key={idx}>
+                  <a href="#" className="text-[#7a6e8a] text-sm hover:text-[#f0e6ff] transition-all hover:translate-x-1 inline-block">
+                    {item}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Support */}
-          <div className="footer-column">
-            <h4 className="footer-heading">Support</h4>
-            <ul className="footer-links">
-              <li><a href="#">FAQ</a></li>
-              <li><a href="#">Shipping</a></li>
-              <li><a href="#">Returns</a></li>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Service</a></li>
+          <div>
+            <h4 className="text-[#f0e6ff] font-bold text-sm uppercase tracking-widest mb-6 border-l-2 border-[#6a0dad] pl-4">Support</h4>
+            <ul className="flex flex-col gap-3">
+              {['FAQ', 'Shipping', 'Returns', 'Privacy Policy', 'Terms'].map((item, idx) => (
+                <li key={idx}>
+                  <a href="#" className="text-[#7a6e8a] text-sm hover:text-[#f0e6ff] transition-all hover:translate-x-1 inline-block">
+                    {item}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="footer-bottom">
-          <p>
-            © {new Date().getFullYear()} Luxora. All rights reserved.
-          </p>
-          <p className="footer-made-with">
-            Made with <HiHeart className="heart-icon" /> for fragrance lovers
+        <div className="flex flex-col md:flex-row items-center justify-between border-t border-[rgba(155,89,182,0.1)] pt-10 text-[#7a6e8a] text-sm gap-4">
+          <p>© {new Date().getFullYear()} Luxora. All rights reserved.</p>
+          <p className="flex items-center gap-1">
+            Made with <HiHeart className="text-[#6a0dad] animate-pulse" /> for fragrance lovers
           </p>
         </div>
       </div>
