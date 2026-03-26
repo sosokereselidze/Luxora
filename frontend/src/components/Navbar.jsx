@@ -24,68 +24,70 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 h-20 z-[1000] transition-all duration-300 ${scrolled ? 'bg-[#0a0a0f]/85 backdrop-blur-[20px] border-b border-[rgba(155,89,182,0.15)] shadow-md' : 'bg-transparent'}`}>
-      <div className="flex items-center justify-between h-full max-w-[1280px] mx-auto px-6">
+    <nav className={`fixed top-0 left-0 right-0 h-20 z-[1000] transition-all duration-500 ${scrolled ? 'bg-[#07070a]/90 backdrop-blur-[20px] border-b border-[#6a0dad]/20 shadow-glow' : 'bg-transparent'}`}>
+      <div className="flex items-center justify-between h-full max-w-[1400px] mx-auto px-8">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-[10px] font-luxury text-2xl font-bold tracking-[3px] text-[#f0e6ff] hover:text-[#d4a5ff] transition-all group">
-          <span className="text-[1.3rem] animate-float bg-gradient-primary bg-clip-text text-transparent group-hover:scale-110 transition-transform">✦</span>
-          <span className="font-['Playfair_Display']">LUXORA</span>
+        <Link to="/" className="flex items-center gap-3 font-luxury text-3xl font-bold tracking-[4px] text-white hover:text-[#d4a5ff] transition-all group">
+          <span className="text-2xl animate-float bg-gradient-primary bg-clip-text text-transparent group-hover:scale-110 transition-transform">✦</span>
+          <span className="font-luxury">LUXORA</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-2">
-          <Link to="/" className={`relative flex items-center gap-[6px] px-[18px] py-2 text-[#b8a9cc] font-medium text-[0.9rem] tracking-[0.5px] uppercase rounded-full transition-all hover:text-[#f0e6ff] hover:bg-[#6a0dad]/10 ${isActive('/') ? 'text-[#f0e6ff] bg-[#6a0dad]/15 after:content-[""] after:absolute after:bottom-0.5 after:left-1/2 after:-translate-x-1/2 after:w-5 after:h-0.5 after:bg-gradient-primary after:rounded-full' : ''}`}>
+        <div className="hidden md:flex items-center gap-4">
+          <Link to="/" className={`relative flex items-center gap-2 px-5 py-2 text-[#c8bdff] font-semibold text-[0.85rem] tracking-[0.1em] uppercase rounded-full transition-all hover:text-white hover:bg-[#6a0dad]/10 ${isActive('/') ? 'text-white bg-[#6a0dad]/20' : ''}`}>
             Home
           </Link>
-          <Link to="/shop" className={`relative flex items-center gap-[6px] px-[18px] py-2 text-[#b8a9cc] font-medium text-[0.9rem] tracking-[0.5px] uppercase rounded-full transition-all hover:text-[#f0e6ff] hover:bg-[#6a0dad]/10 ${isActive('/shop') ? 'text-[#f0e6ff] bg-[#6a0dad]/15 after:content-[""] after:absolute after:bottom-0.5 after:left-1/2 after:-translate-x-1/2 after:w-5 after:h-0.5 after:bg-gradient-primary after:rounded-full' : ''}`}>
+          <Link to="/shop" className={`relative flex items-center gap-2 px-5 py-2 text-[#c8bdff] font-semibold text-[0.85rem] tracking-[0.1em] uppercase rounded-full transition-all hover:text-white hover:bg-[#6a0dad]/10 ${isActive('/shop') ? 'text-white bg-[#6a0dad]/20' : ''}`}>
             Shop
           </Link>
           {user && user.role === 'admin' && (
-            <Link to="/admin" className={`relative flex items-center gap-[6px] px-[18px] py-2 text-[#b8a9cc] font-medium text-[0.9rem] tracking-[0.5px] uppercase rounded-full transition-all hover:text-[#f0e6ff] hover:bg-[#6a0dad]/10 ${isActive('/admin') ? 'text-[#f0e6ff] bg-[#6a0dad]/15' : ''}`}>
-              <HiCog /> Admin
+            <Link to="/admin" className={`relative flex items-center gap-2 px-5 py-2 text-[#c8bdff] font-semibold text-[0.85rem] tracking-[0.1em] uppercase rounded-full transition-all hover:text-white hover:bg-[#6a0dad]/10 ${isActive('/admin') ? 'text-white bg-[#6a0dad]/20' : ''}`}>
+              <HiCog className="text-lg" /> Admin
             </Link>
           )}
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2">
-          <Link to="/cart" className="relative flex items-center justify-center w-[42px] h-[42px] rounded-full bg-transparent text-[#b8a9cc] text-xl transition-all hover:text-[#f0e6ff] hover:bg-[#6a0dad]/15" title="Cart">
+        <div className="flex items-center gap-4">
+          <Link to="/cart" className="relative flex items-center justify-center w-11 h-11 rounded-full bg-transparent text-[#c8bdff] text-2xl transition-all hover:text-white hover:bg-[#6a0dad]/20" title="Cart">
             <HiShoppingBag />
             {totalItems > 0 && (
-              <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-[#6a0dad] text-white text-[10px] font-bold rounded-full px-[5px] animate-fade-in">{totalItems}</span>
+              <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] flex items-center justify-center bg-gradient-primary text-white text-[10px] font-bold rounded-full px-1.5 shadow-lg animate-fade-in">{totalItems}</span>
             )}
           </Link>
 
           {user ? (
             <div className="relative group">
-              <button className="flex items-center justify-center w-[42px] h-[42px] rounded-full bg-transparent text-[#b8a9cc] text-xl transition-all hover:text-[#f0e6ff] hover:bg-[#6a0dad]/15" title={user.name}>
+              <button className="flex items-center justify-center w-11 h-11 rounded-full bg-transparent text-[#c8bdff] text-2xl transition-all hover:text-white hover:bg-[#6a0dad]/20" title={user.name}>
                 <HiUser />
               </button>
-              <div className="absolute top-[calc(100%+8px)] right-0 min-w-[220px] bg-[#1a1a2e] border border-[rgba(155,89,182,0.15)] rounded-xl shadow-lg overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 -translate-y-2 transition-all duration-300">
-                <div className="p-4">
-                  <p className="font-semibold text-[0.95rem] text-[#f0e6ff]">{user.name}</p>
-                  <p className="text-[0.8rem] text-[#7a6e8a] mt-0.5">{user.email}</p>
+              <div className="absolute top-[calc(100%+12px)] right-0 min-w-[240px] bg-[#151525] border border-[#6a0dad]/20 rounded-2xl shadow-2xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 -translate-y-4 transition-all duration-500 backdrop-blur-xl">
+                <div className="p-5">
+                  <p className="font-bold text-[1rem] text-white leading-tight">{user.name}</p>
+                  <p className="text-[0.75rem] text-[#8a81ad] mt-1 font-medium">{user.email}</p>
                 </div>
-                <div className="h-px bg-[rgba(155,89,182,0.15)]"></div>
-                {user.role === 'admin' && (
-                  <Link to="/admin" className="flex items-center gap-[10px] p-4 text-[#b8a9cc] text-[0.9rem] transition-all hover:bg-[#6a0dad]/10 hover:text-[#f0e6ff]">
-                    <HiCog /> Admin Panel
-                  </Link>
-                )}
-                <button onClick={logout} className="flex items-center gap-[10px] p-4 text-[#b8a9cc] text-[0.9rem] transition-all hover:bg-red-500/10 hover:text-red-400 w-full text-left">
-                  <HiLogout /> Logout
-                </button>
+                <div className="h-px bg-gradient-to-r from-transparent via-[#6a0dad]/20 to-transparent"></div>
+                <div className="p-2">
+                  {user.role === 'admin' && (
+                    <Link to="/admin" className="flex items-center gap-3 p-3 text-[#c8bdff] text-sm font-semibold rounded-xl transition-all hover:bg-[#6a0dad]/10 hover:text-white">
+                      <HiCog className="text-lg" /> Admin Panel
+                    </Link>
+                  )}
+                  <button onClick={logout} className="flex items-center gap-3 p-3 text-[#c8bdff] text-sm font-semibold rounded-xl transition-all hover:bg-red-500/10 hover:text-red-400 w-full text-left">
+                    <HiLogout className="text-lg" /> Sign Out
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
-            <Link to="/login" className="hidden md:inline-flex btn btn-primary px-[22px] py-2 text-[0.85rem] rounded-full bg-gradient-button text-white shadow-md hover:shadow-lg transition-all">
-              Login
+            <Link to="/login" className="hidden md:inline-flex btn btn-primary px-7 py-2 text-[0.8rem] rounded-full uppercase tracking-widest">
+              Sign In
             </Link>
           )}
 
           {/* Mobile Toggle */}
           <button
-            className="md:hidden flex items-center justify-center w-[42px] h-[42px] rounded-lg bg-transparent text-[#f0e6ff] text-2xl"
+            className="md:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-[#6a0dad]/10 text-white text-2xl border border-[#6a0dad]/20"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             {mobileOpen ? <HiX /> : <HiMenu />}
@@ -94,14 +96,14 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Menu */}
-      <div className={`md:hidden fixed top-20 left-0 right-0 bg-[#0a0a0f]/95 backdrop-blur-[20px] p-5 flex flex-col gap-1 border-b border-[rgba(155,89,182,0.15)] transition-all duration-300 z-[999] ${mobileOpen ? 'translate-y-0 opacity-100 visible' : '-translate-y-full opacity-0 invisible'}`}>
-        <Link to="/" className={`flex items-center gap-2 p-4 text-lg rounded-xl transition-all ${isActive('/') ? 'bg-[#6a0dad]/20 text-[#f0e6ff]' : 'text-[#b8a9cc]'}`}>Home</Link>
-        <Link to="/shop" className={`flex items-center gap-2 p-4 text-lg rounded-xl transition-all ${isActive('/shop') ? 'bg-[#6a0dad]/20 text-[#f0e6ff]' : 'text-[#b8a9cc]'}`}>Shop</Link>
-        {!user && <Link to="/login" className="flex items-center gap-2 p-4 text-lg text-[#f0e6ff] bg-gradient-primary rounded-xl mt-4 justify-center">Login</Link>}
+      <div className={`md:hidden fixed top-20 left-0 right-0 bg-[#07070a]/95 backdrop-blur-[30px] p-6 flex flex-col gap-2 border-b border-[#6a0dad]/20 transition-all duration-500 ${mobileOpen ? 'translate-y-0 opacity-100 visible' : '-translate-y-10 opacity-0 invisible'}`}>
+        <Link to="/" className="p-4 text-[#c8bdff] font-bold text-lg rounded-2xl hover:bg-[#6a0dad]/10 hover:text-white">Home</Link>
+        <Link to="/shop" className="p-4 text-[#c8bdff] font-bold text-lg rounded-2xl hover:bg-[#6a0dad]/10 hover:text-white">Shop</Link>
+        {user && user.role === 'admin' && (
+          <Link to="/admin" className="p-4 text-[#c8bdff] font-bold text-lg rounded-2xl hover:bg-[#6a0dad]/10 hover:text-white">Admin Panel</Link>
+        )}
+        {!user && <Link to="/login" className="btn btn-primary mt-4">Sign In</Link>}
       </div>
-
-      {/* Mobile Overlay */}
-      {mobileOpen && <div className="md:hidden fixed inset-0 bg-black/50 z-[998]" onClick={() => setMobileOpen(false)} />}
     </nav>
   );
 };
