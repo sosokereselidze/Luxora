@@ -4,22 +4,22 @@ import { FaFacebookF, FaInstagram, FaTwitter, FaPinterestP } from 'react-icons/f
 
 const Footer = () => {
   return (
-    <footer className="relative bg-[#0a0a0f] pt-20 pb-10 border-t border-[rgba(155,89,182,0.1)] overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#6a0dad]/10 blur-[100px] rounded-full pointer-events-none"></div>
+    <footer className="relative bg-bg-dark pt-24 pb-12 border-t border-white/5 overflow-hidden mt-auto">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary/5 blur-[100px] rounded-full pointer-events-none opacity-20"></div>
       
       <div className="container mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
           {/* Brand */}
-          <div className="flex flex-col gap-6">
-            <Link to="/" className="flex items-center gap-[10px] font-luxury text-2xl font-bold tracking-[3px] text-[#f0e6ff] hover:text-[#d4a5ff] transition-all group w-fit">
-              <span className="text-[1.3rem] animate-float bg-gradient-primary bg-clip-text text-transparent group-hover:scale-110 transition-transform">✦</span>
-              <span className="font-['Playfair_Display']">LUXORA</span>
+          <div className="flex flex-col gap-8">
+            <Link to="/" className="flex items-center gap-4 font-display text-2xl font-medium tracking-[0.2em] text-white hover:text-accent-gold transition-all group w-fit">
+              <span className="text-xl animate-float text-accent-gold group-hover:scale-110 transition-transform opacity-70">✦</span>
+              <span>LUXORA</span>
             </Link>
-            <p className="text-[#7a6e8a] text-sm leading-relaxed max-w-[280px]">
+            <p className="text-text-secondary text-[0.8rem] leading-relaxed max-w-[280px] font-light">
               Discover the art of fine fragrance. Curated luxury perfumes 
-              for the discerning individual.
+              for the discerning individual. Hand-crafted, globally sourced.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-5">
               {[
                 { icon: <FaFacebookF />, label: 'Facebook' },
                 { icon: <FaInstagram />, label: 'Instagram' },
@@ -29,10 +29,10 @@ const Footer = () => {
                 <a 
                   key={idx}
                   href="#" 
-                  className="w-10 h-10 rounded-full bg-[#16162a] border border-[rgba(155,89,182,0.15)] flex items-center justify-center text-[#b8a9cc] hover:bg-[#6a0dad] hover:text-white hover:border-[#6a0dad] transition-all" 
+                  className="w-10 h-10 rounded-none bg-white/[0.02] border border-white/10 flex items-center justify-center text-white/30 hover:bg-white hover:text-black hover:border-white transition-all duration-500" 
                   aria-label={social.label}
                 >
-                  {social.icon}
+                  <span className="text-sm">{social.icon}</span>
                 </a>
               ))}
             </div>
@@ -40,17 +40,16 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-[#f0e6ff] font-bold text-sm uppercase tracking-widest mb-6 border-l-2 border-[#6a0dad] pl-4">Quick Links</h4>
-            <ul className="flex flex-col gap-3">
+            <h4 className="text-white/30 font-bold text-[0.6rem] uppercase tracking-[0.4em] mb-10">Shop</h4>
+            <ul className="flex flex-col gap-4">
               {[
-                { to: '/', label: 'Home' },
-                { to: '/shop', label: 'Shop All' },
-                { to: '/shop?category=Women', label: 'Women' },
-                { to: '/shop?category=Men', label: 'Men' },
-                { to: '/shop?category=Unisex', label: 'Unisex' }
+                { to: '/shop', label: 'All Collections' },
+                { to: '/shop?category=Women', label: 'Pour Femme' },
+                { to: '/shop?category=Men', label: 'Pour Homme' },
+                { to: '/shop?category=Unisex', label: 'L\'Universel' }
               ].map((link, idx) => (
                 <li key={idx}>
-                  <Link to={link.to} className="text-[#7a6e8a] text-sm hover:text-[#f0e6ff] transition-all hover:translate-x-1 inline-block">
+                  <Link to={link.to} className="text-text-secondary text-[0.7rem] uppercase tracking-widest font-medium hover:text-white transition-all hover:translate-x-1 inline-block">
                     {link.label}
                   </Link>
                 </li>
@@ -60,11 +59,11 @@ const Footer = () => {
 
           {/* Company */}
           <div>
-            <h4 className="text-[#f0e6ff] font-bold text-sm uppercase tracking-widest mb-6 border-l-2 border-[#6a0dad] pl-4">Company</h4>
-            <ul className="flex flex-col gap-3">
-              {['About Us', 'Contact', 'Careers', 'Press'].map((item, idx) => (
+            <h4 className="text-white/30 font-bold text-[0.6rem] uppercase tracking-[0.4em] mb-10">House</h4>
+            <ul className="flex flex-col gap-4">
+              {['Our Story', 'Craftsmanship', 'Rare Materials', 'Boutiques'].map((item, idx) => (
                 <li key={idx}>
-                  <a href="#" className="text-[#7a6e8a] text-sm hover:text-[#f0e6ff] transition-all hover:translate-x-1 inline-block">
+                  <a href="#" className="text-text-secondary text-[0.7rem] uppercase tracking-widest font-medium hover:text-white transition-all hover:translate-x-1 inline-block">
                     {item}
                   </a>
                 </li>
@@ -74,11 +73,11 @@ const Footer = () => {
 
           {/* Support */}
           <div>
-            <h4 className="text-[#f0e6ff] font-bold text-sm uppercase tracking-widest mb-6 border-l-2 border-[#6a0dad] pl-4">Support</h4>
-            <ul className="flex flex-col gap-3">
-              {['FAQ', 'Shipping', 'Returns', 'Privacy Policy', 'Terms'].map((item, idx) => (
+            <h4 className="text-white/30 font-bold text-[0.6rem] uppercase tracking-[0.4em] mb-10">Client Care</h4>
+            <ul className="flex flex-col gap-4">
+              {['Contact Us', 'Shipping & Returns', 'FAQ', 'Privacy Policy'].map((item, idx) => (
                 <li key={idx}>
-                  <a href="#" className="text-[#7a6e8a] text-sm hover:text-[#f0e6ff] transition-all hover:translate-x-1 inline-block">
+                  <a href="#" className="text-text-secondary text-[0.7rem] uppercase tracking-widest font-medium hover:text-white transition-all hover:translate-x-1 inline-block">
                     {item}
                   </a>
                 </li>
@@ -88,10 +87,10 @@ const Footer = () => {
         </div>
 
         {/* Bottom */}
-        <div className="flex flex-col md:flex-row items-center justify-between border-t border-[rgba(155,89,182,0.1)] pt-10 text-[#7a6e8a] text-sm gap-4">
+        <div className="flex flex-col md:flex-row items-center justify-between border-t border-white/5 pt-12 text-white/20 text-[0.55rem] font-bold uppercase tracking-[0.3em] gap-6">
           <p>© {new Date().getFullYear()} Luxora. All rights reserved.</p>
-          <p className="flex items-center gap-1">
-            Made with <HiHeart className="text-[#6a0dad] animate-pulse" /> for fragrance lovers
+          <p className="flex items-center gap-3">
+            Designed with <HiHeart className="text-accent-gold animate-pulse text-xs" /> for the scent obsessed
           </p>
         </div>
       </div>

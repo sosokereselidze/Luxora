@@ -33,11 +33,12 @@ const Home = () => {
         <HeroSection />
 
         {/* Philosophy Section */}
-        <section className="py-24 md:py-40 relative">
-          <div className="container mx-auto px-8 relative z-10">
-            <div className="max-w-4xl mx-auto text-center border-y border-white/5 py-16">
-              <h3 className="font-luxury text-[#c9a96e] text-sm md:text-base uppercase tracking-[8px] mb-8">Our Philosophy</h3>
-              <p className="font-luxury text-3xl md:text-5xl leading-relaxed md:leading-[1.5] text-white/90">
+        <section className="section-padding relative overflow-hidden">
+          <div className="absolute inset-0 bg-primary/5 blur-[100px] rounded-full -translate-x-1/2 opacity-20"></div>
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="max-w-4xl mx-auto text-center border-y border-white/5 py-20 md:py-32">
+              <h3 className="font-luxury text-accent-gold text-[0.6rem] md:text-[0.7rem] uppercase tracking-[0.6em] mb-10">Our Philosophy</h3>
+              <p className="font-display text-2xl md:text-4xl lg:text-5xl leading-tight md:leading-tight text-white/90 italic font-light">
                 "Perfumery is the invisible art of capturing a memory, a moment, and an emotion inside a beautiful vessel. We source only the rarest botanicals to create signatures for the soul."
               </p>
             </div>
@@ -45,24 +46,24 @@ const Home = () => {
         </section>
 
         {/* Featured Products Section */}
-        <section className="py-24 md:py-32 relative">
-          <div className="container mx-auto px-8">
+        <section className="section-padding relative">
+          <div className="container mx-auto px-6">
             <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
               <div className="max-w-2xl">
-                <h2 className="font-luxury text-5xl md:text-6xl text-white mb-6 tracking-tight">
-                  Featured <span className="italic font-light text-[#c9a96e]">Collections</span>
+                <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-white mb-6">
+                  Featured <span className="italic font-light text-gradient-gold">Collections</span>
                 </h2>
-                <p className="text-[#8a81ad] font-light text-lg">Discover our most coveted scents, handpicked for their unique character and lasting impression.</p>
+                <p className="text-text-secondary font-light text-base md:text-lg">Discover our most coveted scents, handpicked for their unique character and lasting impression.</p>
               </div>
-              <Link to="/shop" className="group flex items-center gap-3 text-white uppercase tracking-[4px] text-xs font-bold hover:text-[#c9a96e] transition-colors pb-2 border-b border-transparent hover:border-[#c9a96e]">
-                View Entire Collection <HiArrowRight className="text-lg group-hover:translate-x-2 transition-transform" />
+              <Link to="/shop" className="group flex items-center gap-3 text-white uppercase tracking-[0.4em] text-[0.6rem] font-bold hover:text-accent-gold transition-colors pb-2 border-b border-transparent hover:border-accent-gold">
+                View All <HiArrowRight className="text-sm group-hover:translate-x-2 transition-transform" />
               </Link>
             </div>
 
             {loading ? (
               <Loading />
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
                 {featuredProducts.map(product => (
                   <ProductCard key={product._id} product={product} />
                 ))}
@@ -72,42 +73,44 @@ const Home = () => {
         </section>
 
         {/* Experience Section */}
-        <section className="py-24 md:py-40 relative">
-          <div className="container mx-auto px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+        <section className="section-padding bg-white/[0.01]">
+          <div className="container mx-auto px-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
               <div className="relative group animate-fade-in-up">
-                <div className="absolute -inset-4 bg-[#c9a96e] opacity-5 blur-3xl rounded-full"></div>
-                <div className="relative aspect-[3/4] overflow-hidden rounded-md">
+                <div className="absolute -inset-10 bg-primary/10 blur-[120px] rounded-full opacity-30"></div>
+                <div className="relative aspect-[4/5] overflow-hidden rounded-none shadow-2xl">
                   <img 
                     src="https://images.unsplash.com/photo-1615529182904-14819c35db37?auto=format&fit=crop&q=80" 
                     alt="Fragrance Experience" 
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[2s] ease-out brightness-90"
+                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[2.5s] ease-out brightness-75"
                   />
-                  <div className="absolute inset-0 border border-white/5 rounded-md pointer-events-none"></div>
+                  <div className="absolute inset-0 border border-white/10 pointer-events-none"></div>
                 </div>
               </div>
               <div className="flex flex-col gap-10">
                 <div>
-                  <h3 className="font-luxury text-[#c9a96e] text-xs uppercase tracking-[5px] mb-6">The Craftsmanship</h3>
-                  <h2 className="font-luxury text-5xl md:text-7xl text-white leading-[1.1]">
+                  <h3 className="font-luxury text-accent-gold text-[0.6rem] uppercase tracking-[0.5em] mb-6">The Craftsmanship</h3>
+                  <h2 className="font-display text-4xl md:text-6xl text-white leading-[1.1] mb-8">
                     Masterfully <br />
-                    <span className="italic font-light text-white/70">Blended</span>
+                    <span className="italic font-light text-white/50">Blended</span>
                   </h2>
+                  <p className="text-text-secondary text-base md:text-lg leading-relaxed font-light">
+                    Every bottle of Luxora is a result of years of research, using only the rarest ingredients sourced from across the globe. Our scents are meticulously balanced to unfold entirely uniquely on your skin over 48 hours.
+                  </p>
                 </div>
-                <p className="text-[#c8bdff] text-lg leading-relaxed font-light">
-                  Every bottle of Luxora is a result of years of research, using only the rarest ingredients sourced from across the globe. Our scents are meticulously balanced to unfold entirely uniquely on your skin over 48 hours.
-                </p>
-                <div className="grid grid-cols-2 gap-12 pt-8 border-t border-white/10">
+                
+                <div className="grid grid-cols-2 gap-10 py-10 border-y border-white/5">
                   <div>
-                    <h4 className="text-5xl font-luxury text-white mb-2">150<span className="text-[#c9a96e]">+</span></h4>
-                    <p className="text-[#8a81ad] text-xs font-bold uppercase tracking-[2px]">Rare Botanicals</p>
+                    <h4 className="text-4xl md:text-5xl font-display text-white mb-2">150<span className="text-accent-gold">+</span></h4>
+                    <p className="text-text-muted text-[0.6rem] font-bold uppercase tracking-[0.3em]">Rare Botanicals</p>
                   </div>
                   <div>
-                    <h4 className="text-5xl font-luxury text-white mb-2">48<span className="text-[#c9a96e]">h</span></h4>
-                    <p className="text-[#8a81ad] text-xs font-bold uppercase tracking-[2px]">Sillage Duration</p>
+                    <h4 className="text-4xl md:text-5xl font-display text-white mb-2">48<span className="text-accent-gold">h</span></h4>
+                    <p className="text-text-muted text-[0.6rem] font-bold uppercase tracking-[0.3em]">Sillage Duration</p>
                   </div>
                 </div>
-                <Link to="/shop" className="btn btn-outline border-white/20 text-white w-fit mt-4 hover:bg-white hover:text-black hover:border-white">
+                
+                <Link to="/shop" className="btn btn-outline border-white/10 text-white w-full sm:w-fit mt-4">
                   Start Your Journey
                 </Link>
               </div>
@@ -116,13 +119,13 @@ const Home = () => {
         </section>
 
         {/* Categories Banner */}
-        <section className="py-24 md:py-32 mb-10">
-          <div className="container mx-auto px-8">
-            <div className="text-center mb-16">
-               <h2 className="font-luxury text-4xl md:text-5xl text-white mb-6">Find Your Signature</h2>
-               <div className="w-12 h-px bg-[#c9a96e] mx-auto"></div>
+        <section className="section-padding">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-20">
+               <h2 className="font-display text-4xl md:text-5xl text-white mb-6">Find Your Signature</h2>
+               <div className="w-16 h-[1px] bg-accent-gold mx-auto opacity-50"></div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 { name: 'Pour Homme', img: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&q=80', cat: 'Men' },
                 { name: 'Pour Femme', img: 'https://images.unsplash.com/photo-1583467875263-d50dec37a88c?auto=format&fit=crop&q=80', cat: 'Women' },
@@ -131,17 +134,18 @@ const Home = () => {
                 <Link 
                   key={idx} 
                   to={`/shop?category=${category.cat}`} 
-                  className="group relative h-[500px] overflow-hidden rounded-md"
+                  className="group relative h-[450px] lg:h-[600px] overflow-hidden rounded-none"
                 >
                   <img 
                     src={category.img} 
                     alt={category.name} 
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[2s] ease-out brightness-75 group-hover:brightness-90"
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-[3s] ease-out brightness-[0.6] group-hover:brightness-[0.8]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                  <div className="absolute inset-0 flex flex-col items-center justify-end p-10">
-                    <h3 className="font-luxury text-3xl text-white mb-6 uppercase tracking-widest">{category.name}</h3>
-                    <span className="text-[#c9a96e] text-[0.65rem] font-bold uppercase tracking-[4px] pb-1 border-b border-transparent group-hover:border-[#c9a96e] transition-colors">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                  <div className="absolute inset-0 flex flex-col items-center justify-end p-12 overflow-hidden">
+                    <h3 className="font-display text-2xl md:text-3xl text-white mb-6 uppercase tracking-[0.4em] transform group-hover:-translate-y-2 transition-transform duration-700">{category.name}</h3>
+                    <div className="h-px w-0 bg-white/50 group-hover:w-full transition-all duration-700 mb-6"></div>
+                    <span className="text-accent-gold text-[0.6rem] font-bold uppercase tracking-[0.5em] opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-700">
                       Explore
                     </span>
                   </div>
@@ -152,25 +156,24 @@ const Home = () => {
         </section>
         
         {/* Newsletter Section */}
-        <section className="py-32 relative overflow-hidden border-t border-white/5">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80')] bg-cover bg-center bg-fixed opacity-10"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#07070a] via-[#07070a]/80 to-[#07070a]"></div>
+        <section className="section-padding relative overflow-hidden border-t border-white/5">
+          <div className="absolute inset-0 bg-primary/5 blur-[150px] rounded-full translate-x-1/2 opacity-20"></div>
           
-          <div className="container mx-auto px-8 relative z-10">
+          <div className="container mx-auto px-6 relative z-10">
             <div className="max-w-3xl mx-auto text-center">
-              <span className="text-[#c9a96e] text-xs font-bold uppercase tracking-[6px] mb-4 block">The Inner Circle</span>
-              <h2 className="font-luxury text-4xl md:text-5xl text-white mb-6">Join the Luxora Society</h2>
-              <p className="text-white/60 text-lg mb-10 font-light">Subscribe to receive exclusive access to limited editions, private events, and insider news from the world of high perfumery.</p>
+              <span className="text-accent-gold text-[0.6rem] font-bold uppercase tracking-[0.6em] mb-6 block">The Inner Circle</span>
+              <h2 className="font-display text-4xl md:text-5xl text-white mb-8">Join the Luxora Society</h2>
+              <p className="text-text-secondary text-base md:text-lg mb-12 font-light leading-relaxed">Subscribe to receive exclusive access to limited editions, private events, and insider news from the world of high perfumery.</p>
               
-              <form className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto" onSubmit={(e) => { e.preventDefault(); alert('Subscribed to society!'); }}>
+              <form className="flex flex-col sm:flex-row gap-0 max-w-xl mx-auto group shadow-2xl" onSubmit={(e) => { e.preventDefault(); alert('Subscribed to society!'); }}>
                 <input 
                   type="email" 
                   placeholder="Enter your email address" 
-                  className="flex-1 px-6 py-4 bg-transparent border border-white/20 text-white placeholder:text-white/40 focus:border-[#c9a96e] focus:ring-1 focus:ring-[#c9a96e]/30 outline-none transition-all rounded-none"
+                  className="input-field border-white/10 bg-white/[0.02] flex-1 !py-5"
                   required
                 />
-                <button type="submit" className="btn btn-outline border-white/20 text-white hover:bg-white hover:text-black uppercase tracking-[3px] text-xs py-4 px-10 rounded-none">
-                  Subscribe
+                <button type="submit" className="btn btn-primary !px-12 !py-5">
+                  Join
                 </button>
               </form>
             </div>
