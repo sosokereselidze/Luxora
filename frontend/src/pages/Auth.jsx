@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import { HiMail, HiLockClosed, HiUser, HiArrowRight } from 'react-icons/hi';
 
@@ -12,11 +13,24 @@ const Auth = ({ isRegister = false }) => {
     confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
-  const { login, register } = useAuth();
   const navigate = useNavigate();
+  const { login, register, googleLogin } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    try {
+      await googleLogin(credentialResponse.credential);
+      toast.success('Signed in with Google!');
+      navigate('/');
+    } catch (error) {
+      toast.error('Google Sign-In failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -141,6 +155,26 @@ const Auth = ({ isRegister = false }) => {
               {!loading && <HiArrowRight className="text-lg" />}
             </button>
           </form>
+
+          <div className="flex items-center gap-4 my-8">
+            <div className="h-[1px] bg-white/10 flex-1"></div>
+            <span className="text-[0.6rem] font-bold text-white/30 uppercase tracking-[0.3em]">OR</span>
+            <div className="h-[1px] bg-white/10 flex-1"></div>
+          </div>
+
+          <div className="flex justify-center">
+            <div className="w-full grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => toast.error('Google Login Error')}
+                useOneTap
+                theme="dark"
+                shape="square"
+                width="100%"
+                locale="en"
+              />
+            </div>
+          </div>
 
           <p className="text-center mt-10 text-[0.7rem] uppercase tracking-[0.2em] font-bold text-white/30">
             {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}

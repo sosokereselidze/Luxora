@@ -21,5 +21,10 @@ export const register = async (name, email, password) => {
   return data;
 };
 
+export const googleLogin = async (token) => {
+  const { data } = await axios.post(`${API_BASE}/auth/google`, { token });
+  return data;
+};
+
 // Use apiClient for authenticated requests
 export const getMe = () => apiClient.get('/auth/me');

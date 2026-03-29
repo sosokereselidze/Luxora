@@ -27,12 +27,12 @@ const Navbar = () => {
     <nav className={`fixed top-0 left-0 right-0 h-20 md:h-24 z-[1000] transition-all duration-700 ${scrolled ? 'bg-bg-dark/80 backdrop-blur-2xl border-b border-white/5' : 'bg-transparent'}`}>
       <div className="flex items-center justify-between h-full max-w-[1500px] mx-auto px-6 md:px-12">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-4 font-display text-2xl md:text-3xl font-medium tracking-[0.3em] text-white hover:text-accent-gold transition-all group">
-          <span className="text-xl text-accent-gold animate-float opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">✦</span>
-          <span className="relative">
-            LUXORA
-            <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-accent-gold transition-all duration-700 group-hover:w-full"></span>
-          </span>
+        <Link to="/" className="flex items-center gap-3 text-white hover:opacity-80 transition-all group">
+          <img 
+            src="/Luxora_logo.png" 
+            alt="Luxora Logo" 
+            className="h-14 md:h-16 object-contain" 
+          />
         </Link>
 
         {/* Desktop Navigation */}
