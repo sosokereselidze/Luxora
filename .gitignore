@@ -26,8 +26,8 @@ pnpm-debug.log*
 .DS_Store
 
 # Uploads (user-generated content)
-backend/uploads/*
-!backend/uploads/.gitkeep
+server/uploads/*
+!server/uploads/.gitkeep
 
 # Misc
 *.local

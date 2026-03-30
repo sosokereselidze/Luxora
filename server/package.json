@@ -1,7 +1,7 @@
 {
-  "name": "luxora-backend",
+  "name": "server",
   "version": "1.0.0",
-  "description": "Luxora Perfume E-Commerce Backend API",
+  "description": "Luxora Perfume E-Commerce Server API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
