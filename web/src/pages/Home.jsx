@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import HeroSection from '../components/HeroSection';
 import ProductCard from '../components/ProductCard';
 import Loading from '../components/Loading';
-import { getProducts } from '../api/products';
+import { getStoredFragrances } from '../api/fragrances';
 import { HiArrowRight } from 'react-icons/hi';
+import FragranceCard from '../components/FragranceCard';
 
 const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -13,8 +14,8 @@ const Home = () => {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const { data } = await getProducts({ featured: 'true' });
-        setFeaturedProducts(data.slice(0, 4));
+        const response = await getStoredFragrances({ page: 1, limit: 4 });
+        setFeaturedProducts(response.fragrances || []);
       } catch (error) {
         console.error('Error fetching featured products:', error);
       } finally {
@@ -64,8 +65,8 @@ const Home = () => {
               <Loading />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
-                {featuredProducts.map(product => (
-                  <ProductCard key={product._id} product={product} />
+                {featuredProducts.map(fragrance => (
+                  <FragranceCard key={fragrance._id} fragrance={fragrance} />
                 ))}
               </div>
             )}

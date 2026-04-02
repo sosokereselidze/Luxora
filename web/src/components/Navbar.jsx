@@ -43,6 +43,9 @@ const Navbar = () => {
           <Link to="/shop" className={`px-4 py-2 text-[0.6rem] font-bold tracking-[0.4em] uppercase transition-all duration-500 hover:text-accent-gold ${isActive('/shop') ? 'text-accent-gold' : 'text-white/60'}`}>
             Shop
           </Link>
+          <Link to="/explore" className={`px-4 py-2 text-[0.6rem] font-bold tracking-[0.4em] uppercase transition-all duration-500 hover:text-accent-gold ${isActive('/explore') ? 'text-accent-gold' : 'text-white/60'}`}>
+            Explore
+          </Link>
           {user && user.role === 'admin' && (
             <Link to="/admin" className={`px-4 py-2 text-[0.6rem] font-bold tracking-[0.4em] uppercase transition-all duration-500 hover:text-accent-gold ${isActive('/admin') ? 'text-accent-gold' : 'text-white/60'}`}>
               Admin
@@ -102,6 +105,7 @@ const Navbar = () => {
       <div className={`md:hidden fixed top-20 left-0 right-0 bg-bg-dark/95 backdrop-blur-3xl p-8 flex flex-col gap-4 border-b border-white/5 transition-all duration-700 ${mobileOpen ? 'translate-y-0 opacity-100 visible' : '-translate-y-full opacity-0 invisible'}`}>
         <Link to="/" className="text-white font-bold text-[0.7rem] uppercase tracking-[0.4em] py-4 border-b border-white/5">Home</Link>
         <Link to="/shop" className="text-white font-bold text-[0.7rem] uppercase tracking-[0.4em] py-4 border-b border-white/5">Shop Collection</Link>
+        <Link to="/explore" className="text-white font-bold text-[0.7rem] uppercase tracking-[0.4em] py-4 border-b border-white/5">Explore Fragrances</Link>
         {user && user.role === 'admin' && (
           <Link to="/admin" className="text-white font-bold text-[0.7rem] uppercase tracking-[0.4em] py-4 border-b border-white/5">Admin Control</Link>
         )}

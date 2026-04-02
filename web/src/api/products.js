@@ -21,3 +21,6 @@ export const updateProduct = (id, data) =>
   apiClient.put(`/products/${id}`, data);
 
 export const deleteProduct = (id) => apiClient.delete(`/products/${id}`);
+
+export const createReview = (id, data) =>
+  apiClient.post(`/products/${id}/reviews`, data);

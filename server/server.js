@@ -28,6 +28,7 @@ app.use(cors({
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/fragrances', require('./routes/fragranceRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

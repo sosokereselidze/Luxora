@@ -31,27 +31,27 @@ const Cart = () => {
           {/* Items List */}
           <div className="lg:col-span-2 flex flex-col gap-6">
             {cartItems.map((item) => (
-              <div key={item._id} className="group relative bg-white/[0.01] border border-white/5 p-6 md:p-8 flex flex-col sm:flex-row items-center gap-8 transition-all hover:bg-white/[0.02]">
-                <Link to={`/product/${item._id}`} className="w-full sm:w-32 aspect-[4/5] bg-white/[0.02] p-4 flex items-center justify-center border border-white/5 group-hover:border-accent-gold/20 transition-all">
+              <div key={item._id || item.id} className="group relative bg-white/[0.01] border border-white/5 p-6 md:p-8 flex flex-col sm:flex-row items-center gap-8 transition-all hover:bg-white/[0.02]">
+                <Link to={`/product/${item._id || item.id}`} className="w-full sm:w-32 aspect-[4/5] bg-white/[0.02] p-4 flex items-center justify-center border border-white/5 group-hover:border-accent-gold/20 transition-all">
                   <img src={item.image} alt={item.name} className="max-w-full max-h-full object-contain transform group-hover:scale-110 transition-transform duration-700" />
                 </Link>
                 
                 <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row justify-between items-center sm:items-start gap-8">
                   <div className="text-center sm:text-left">
                     <p className="text-accent-gold text-[0.55rem] uppercase tracking-[0.4em] mb-2 font-luxury opacity-80">{item.brand}</p>
-                    <Link to={`/product/${item._id}`} className="text-lg md:text-xl font-display text-white hover:text-accent-gold transition-all block mb-2">{item.name}</Link>
+                    <Link to={`/product/${item._id || item.id}`} className="text-lg md:text-xl font-display text-white hover:text-accent-gold transition-all block mb-2">{item.name}</Link>
                     <p className="text-[0.6rem] uppercase tracking-[0.3em] font-bold text-white/30">{item.volume}</p>
                   </div>
                   
                   <div className="flex flex-col items-center sm:items-end gap-6 w-full sm:w-auto mt-4 sm:mt-0">
                     <div className="flex items-center h-[40px] px-4 bg-white/[0.02] border border-white/10 gap-6">
                       <button 
-                        onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item._id || item.id, item.quantity - 1)}
                         className="text-white/40 hover:text-white transition-all font-light"
                       ><HiMinus /></button>
                       <span className="text-white font-body text-sm min-w-[20px] text-center">{item.quantity}</span>
                       <button 
-                        onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item._id || item.id, item.quantity + 1)}
                         className="text-white/40 hover:text-white transition-all font-light"
                       ><HiPlus /></button>
                     </div>
@@ -59,7 +59,7 @@ const Cart = () => {
                     <div className="flex items-center justify-between w-full sm:w-auto gap-8 mt-2 sm:mt-0">
                       <p className="text-xl font-body font-light tracking-widest text-white">${(item.price * item.quantity).toFixed(2)}</p>
                       <button 
-                        onClick={() => removeFromCart(item._id)} 
+                        onClick={() => removeFromCart(item._id || item.id)} 
                         className="text-white/20 hover:text-red-400 transition-all text-lg"
                         title="Remove item"
                       >

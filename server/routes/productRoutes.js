@@ -6,7 +6,8 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
-  getBrands
+  getBrands,
+  createProductReview
 } = require('../controllers/productController');
 const { protect, admin } = require('../middleware/auth');
 
@@ -14,6 +15,7 @@ const { protect, admin } = require('../middleware/auth');
 router.get('/brands/list', getBrands);
 router.get('/', getProducts);
 router.get('/:id', getProduct);
+router.post('/:id/reviews', protect, createProductReview);
 
 // Admin routes
 router.post('/', protect, admin, createProduct);
