@@ -32,20 +32,26 @@ exports.register = async (req, res) => {
   }
 };
 
-// @desc    Login user
+// @desc    Login user (supports email OR username)
 // @route   POST /api/auth/login
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).select('+password');
+    // Support login by email or by username (name field)
+    const isEmail = email && email.includes('@');
+    const query = isEmail
+      ? { email: email.toLowerCase().trim() }
+      : { name: email.trim() };
+
+    const user = await User.findOne(query).select('+password');
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     res.json({

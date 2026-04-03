@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -15,21 +16,71 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Auth from './pages/Auth';
 import Admin from './pages/Admin';
+import AdminLogin from './pages/AdminLogin';
 import FragranceExplorer from './pages/FragranceExplorer';
 
-// Protected Route Wrapper
+// Protected Route — any logged-in user
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" />;
+  if (adminOnly && user.role !== 'admin') return <Navigate to="/" />;
+  return children;
+};
+
+// Admin Route — redirects non-admins to /admin/login
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/admin/login" />;
+  if (user.role !== 'admin') return <Navigate to="/admin/login" />;
+  return children;
+};
+
+// Inner app — needs access to location for layout decisions
+const AppInner = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  const isAdminPage = location.pathname.startsWith('/admin');
+
+  // If user is admin and NOT on an admin page, force them to the admin dashboard
+  // This ensures admins only see the admin platform.
+  useEffect(() => {
+    if (!loading && user && user.role === 'admin' && !isAdminPage) {
+      navigate('/admin');
+    }
+  }, [user, loading, isAdminPage, navigate, location.pathname]);
 
   if (loading) return null;
 
-  if (!user) return <Navigate to="/login" />;
+  return (
+    <div className={isAdminPage ? '' : 'flex flex-col min-h-screen'}>
+      <Toaster position="top-right" />
+      {!isAdminPage && <Navbar />}
+      <main className={isAdminPage ? '' : 'flex-grow pt-0'}>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/explore" element={<FragranceExplorer />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/login" element={<Auth />} />
+          <Route path="/register" element={<Auth isRegister />} />
 
-  if (adminOnly && user.role !== 'admin') {
-    return <Navigate to="/" />;
-  }
+          {/* Protected user routes */}
+          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
 
-  return children;
+          {/* Admin routes — no Navbar/Footer */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+          <Route path="/admin/*" element={<AdminRoute><Admin /></AdminRoute>} />
+        </Routes>
+      </main>
+      {!isAdminPage && <Footer />}
+    </div>
+  );
 };
 
 function App() {
@@ -37,33 +88,7 @@ function App() {
     <Router>
       <AuthProvider>
         <CartProvider>
-          <div className="flex flex-col min-h-screen">
-            <Toaster position="top-right" />
-            <Navbar />
-            <main className="flex-grow pt-0">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/explore" element={<FragranceExplorer />} />
-                <Route path="/product/:id" element={<ProductDetails />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-                <Route path="/login" element={<Auth />} />
-                <Route path="/register" element={<Auth isRegister />} />
-
-                {/* Admin Routes */}
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Admin />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
+          <AppInner />
         </CartProvider>
       </AuthProvider>
     </Router>

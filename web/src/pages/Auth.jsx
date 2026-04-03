@@ -23,9 +23,10 @@ const Auth = ({ isRegister = false }) => {
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
     try {
-      await googleLogin(credentialResponse.credential);
+      const data = await googleLogin(credentialResponse.credential);
       toast.success('Signed in with Google!');
-      navigate('/');
+      if (data.role === 'admin') navigate('/admin');
+      else navigate('/');
     } catch (error) {
       toast.error('Google Sign-In failed');
     } finally {
@@ -45,8 +46,12 @@ const Auth = ({ isRegister = false }) => {
         await register(formData.name, formData.email, formData.password);
         toast.success('Welcome to Luxora!');
       } else {
-        await login(formData.email, formData.password);
+        const data = await login(formData.email, formData.password);
         toast.success('Welcome back!');
+        if (data.role === 'admin') {
+          navigate('/admin');
+          return;
+        }
       }
       navigate('/');
     } catch (error) {

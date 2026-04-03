@@ -20,7 +20,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Enable CORS
 app.use(cors({
-  origin: ['http://localhost:5174', 'http://localhost:3000'],
+  origin: ['http://localhost:5174', 'http://localhost:5173', 'http://localhost:3000'],
   credentials: true
 }));
 
@@ -29,6 +29,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/fragrances', require('./routes/fragranceRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -50,7 +51,39 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Luxora Server running on port ${PORT}`);
   console.log(`📡 API: http://localhost:${PORT}/api`);
+
+  // Ensure the admin user exists
+  try {
+    const User = require('./models/User');
+    const bcrypt = require('bcryptjs');
+
+    let admin = await User.findOne({ 
+      $or: [
+        { email: 'soso.kereselidze1@gmail.com' },
+        { name: 'sosokereselidze0' }
+      ]
+    });
+
+    if (!admin) {
+      admin = await User.create({
+        name: 'sosokereselidze0',
+        email: 'soso.kereselidze1@gmail.com',
+        password: 'admin0',
+        role: 'admin'
+      });
+      console.log('✅ Admin user created: soso.kereselidze1@gmail.com / admin0');
+    } else {
+      // Ensure role is admin
+      if (admin.role !== 'admin') {
+        admin.role = 'admin';
+        await admin.save();
+      }
+      console.log('✅ Admin user verified');
+    }
+  } catch (err) {
+    console.error('⚠️  Admin user setup error:', err.message);
+  }
 });
