@@ -1,5 +1,15 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "server/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "web/dist/**/*",
+      "use": "@vercel/static"
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -8,6 +18,10 @@
     {
       "source": "/uploads/(.*)",
       "destination": "/server/uploads/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/web/dist/$1"
     }
   ]
 }

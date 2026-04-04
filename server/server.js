@@ -87,3 +87,5 @@ app.listen(PORT, async () => {
     console.error('⚠️  Admin user setup error:', err.message);
   }
 });
+
+module.exports = app;
