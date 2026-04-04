@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-// In dev, use proxy (relative). In prod, use VITE_API_URL or full URL
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+// In dev, always use relative proxy (/api) to avoid CORS issues
+// In prod, use VITE_API_URL or default to relative if the proxy is handled by the platform (like Vercel rewrites)
+const API_BASE = import.meta.env.MODE === 'development' ? '/api' : (import.meta.env.VITE_API_URL || '/api');
 
 export const apiClient = axios.create({
   baseURL: API_BASE,
