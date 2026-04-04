@@ -21,7 +21,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/web/dist/$1"
+      "destination": "/web/dist/index.html"
     }
   ]
 }

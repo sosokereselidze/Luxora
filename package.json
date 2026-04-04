@@ -8,6 +8,7 @@
     "web": "cd web && npm run dev",
     "dev": "concurrently \"npm run server\" \"npm run web\"",
     "start": "concurrently \"cd server && npm start\" \"cd web && npm run dev\"",
+    "build": "cd web && npm run build",
     "seed": "cd server && npm run seed"
   },
   "dependencies": {
