@@ -1,6 +1,13 @@
 const fragranceService = require('../services/fragranceService');
 const Fragrance = require('../models/Fragrance');
 
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400';
+
+const validateImage = async (imageUrl) => {
+  if (!imageUrl || typeof imageUrl !== 'string') return DEFAULT_IMAGE;
+  return imageUrl;
+};
+
 // ---------------------------------------------------------
 // PUBLIC FRAGELLA API PROXY ROUTES
 // ---------------------------------------------------------
@@ -179,9 +186,19 @@ exports.getStoredFragrances = async (req, res) => {
       }
     }
 
+    // Sort Option
+    let sortOption = { createdAt: -1 };
+    if (req.query.sort === 'bestsellers') {
+      sortOption = { sold: -1 };
+    } else if (req.query.sort === 'price_asc') {
+      sortOption = { price: 1 };
+    } else if (req.query.sort === 'price_desc') {
+      sortOption = { price: -1 };
+    }
+
     const total = await Fragrance.countDocuments(query);
     const fragrances = await Fragrance.find(query)
-      .sort({ createdAt: -1 })
+      .sort(sortOption)
       .skip((page - 1) * limit)
       .limit(limit);
 
@@ -206,19 +223,19 @@ exports.importFragrances = async (req, res) => {
     }
 
     const importResults = await Promise.all(fragrances.map(async (f) => {
-      // Handle both capitalized (external API) and lowercase (our internal format)
       const name = f.Name || f.name;
       const brand = f.Brand || f.brand;
       const externalId = f.id;
+      const rawImage = f['Image URL'] || f.image || f.thumbnail || f.imageUrl;
+      const image = await validateImage(rawImage);
       
-      // Upsert based on external ID if it exists, otherwise name+brand
       const filter = externalId ? { id: externalId } : { name, brand };
       
       const update = {
         id: externalId,
         name: name,
         brand: brand,
-        image: f['Image URL'] || f.image || f.thumbnail || f.imageUrl,
+        image: image,
         description: f.Description || f.description || '',
         topNotes: f['Top Notes'] || f.topNotes || [],
         middleNotes: f['Middle Notes'] || f.middleNotes || f['Heart Notes'] || [],
@@ -300,6 +317,9 @@ exports.getStoredFragrance = async (req, res) => {
 // @route   PUT /api/fragrances/store/:id
 exports.updateStoredFragrance = async (req, res) => {
   try {
+    if (req.body.image) {
+      req.body.image = await validateImage(req.body.image);
+    }
     const fragrance = await Fragrance.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!fragrance) return res.status(404).json({ message: 'Fragrance not found' });
     res.json(fragrance);

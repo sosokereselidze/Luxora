@@ -34,6 +34,10 @@ const fragranceSchema = new mongoose.Schema({
     enum: ['Men', 'Women', 'Unisex', 'Unknown'],
     default: 'Unisex'
   },
+  volume: {
+    type: String,
+    default: '100ml'
+  },
   topNotes: [String],
   middleNotes: [String],
   baseNotes: [String],
@@ -49,6 +53,10 @@ const fragranceSchema = new mongoose.Schema({
   stock: {
     type: Number,
     default: 10
+  },
+  sold: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true

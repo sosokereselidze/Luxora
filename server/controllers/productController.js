@@ -53,6 +53,9 @@ exports.getProducts = async (req, res) => {
       case 'rating':
         sortOption = { rating: -1 };
         break;
+      case 'bestsellers':
+        sortOption = { sold: -1 };
+        break;
       default:
         sortOption = { createdAt: -1 };
     }

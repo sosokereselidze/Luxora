@@ -14,8 +14,8 @@ const Home = () => {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const response = await getStoredFragrances({ page: 1, limit: 4 });
-        setFeaturedProducts(response.fragrances || []);
+        const { data } = await getStoredFragrances({ sort: 'bestsellers', limit: 10 });
+        setFeaturedProducts(data.fragrances && Array.isArray(data.fragrances) ? data.fragrances : []); 
       } catch (error) {
         console.error('Error fetching featured products:', error);
       } finally {
@@ -46,15 +46,15 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Featured Products Section */}
-        <section className="section-padding relative">
+        {/* Featured Products Section (Best Sellers) */}
+        <section className="section-padding relative overflow-hidden">
           <div className="container mx-auto px-6">
             <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
               <div className="max-w-2xl">
                 <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-white mb-6">
                   Featured <span className="italic font-light text-gradient-gold">Collections</span>
                 </h2>
-                <p className="text-text-secondary font-light text-base md:text-lg">Discover our most coveted scents, handpicked for their unique character and lasting impression.</p>
+                <p className="text-text-secondary font-light text-base md:text-lg">Our top 10 most coveted masterpieces, curated for ultimate luxury.</p>
               </div>
               <Link to="/shop" className="group flex items-center gap-3 text-white uppercase tracking-[0.4em] text-[0.6rem] font-bold hover:text-accent-gold transition-colors pb-2 border-b border-transparent hover:border-accent-gold">
                 View All <HiArrowRight className="text-sm group-hover:translate-x-2 transition-transform" />
@@ -64,13 +64,52 @@ const Home = () => {
             {loading ? (
               <Loading />
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
-                {featuredProducts.map(fragrance => (
-                  <FragranceCard key={fragrance._id} fragrance={fragrance} />
-                ))}
+              <div className="relative group/gallery">
+                {/* Arrow Navigation */}
+                <button 
+                  onClick={() => {
+                    const el = document.getElementById('bestseller-slider');
+                    el.scrollBy({ left: -300, behavior: 'smooth' });
+                  }}
+                  className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/80 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover/gallery:opacity-100 transition-all hover:border-accent-gold hover:text-accent-gold"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                
+                <button 
+                  onClick={() => {
+                    const el = document.getElementById('bestseller-slider');
+                    el.scrollBy({ left: 300, behavior: 'smooth' });
+                  }}
+                  className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/80 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover/gallery:opacity-100 transition-all hover:border-accent-gold hover:text-accent-gold"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+
+                {/* Horizontal Slider with Scroll Snap */}
+                <div 
+                  id="bestseller-slider"
+                  className="flex overflow-x-auto scroll-smooth no-scrollbar gap-6 pb-8 snap-x snap-mandatory"
+                  style={{ maskImage: 'linear-gradient(to right, black 90%, transparent)' }}
+                >
+                  {featuredProducts.map((fragrance) => (
+                    <div 
+                      key={fragrance._id} 
+                      className="flex-none w-[280px] md:w-[320px] transition-transform duration-500 hover:scale-[1.02] snap-start"
+                    >
+                      <FragranceCard fragrance={fragrance} />
+                    </div>
+                  ))}
+                  {/* Empty spacer for end padding */}
+                  <div className="flex-none w-px h-full"></div>
+                </div>
               </div>
             )}
           </div>
+          <style>{`
+            .no-scrollbar::-webkit-scrollbar { display: none; }
+            .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+          `}</style>
         </section>
 
         {/* Experience Section */}

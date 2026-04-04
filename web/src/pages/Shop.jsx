@@ -2,16 +2,16 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import FragranceCard from '../components/FragranceCard';
 import Loading from '../components/Loading';
-import { 
-  getStoredFragrances, 
-  toggleVisibility, 
-  deleteStoredFragrance, 
+import {
+  getStoredFragrances,
+  toggleVisibility,
+  deleteStoredFragrance,
   getStoredBrands,
   getStoredAccords,
   getStoredNotes
 } from '../api/fragrances';
-import { 
-  HiSearch, HiX, HiAdjustments, HiChevronLeft, HiChevronRight, 
+import {
+  HiSearch, HiX, HiAdjustments, HiChevronLeft, HiChevronRight,
   HiEye, HiEyeOff, HiTrash, HiSparkles, HiFilter, HiSortDescending,
   HiCurrencyDollar, HiBeaker, HiHashtag
 } from 'react-icons/hi';
@@ -23,7 +23,7 @@ const Shop = () => {
 
   const [fragrances, setFragrances] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Filtering State
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -36,7 +36,7 @@ const Shop = () => {
   const [accord, setAccord] = useState('');
   const [note, setNote] = useState('');
   const [volume, setVolume] = useState('');
-  
+
   // Data for Filters
   const [brands, setBrands] = useState([]);
   const [accords, setAccords] = useState([]);
@@ -59,7 +59,7 @@ const Shop = () => {
         volume,
         admin: isAdmin ? 'true' : 'false'
       };
-      
+
       const { data } = await getStoredFragrances(params);
       setFragrances(data.fragrances);
       setTotalPages(data.pages);
@@ -120,7 +120,7 @@ const Shop = () => {
   const handleDelete = async (e, id) => {
     e.stopPropagation();
     if (!window.confirm('Are you sure you want to delete this fragrance?')) return;
-    
+
     try {
       await deleteStoredFragrance(id);
       toast.success('Fragrance deleted');
@@ -164,8 +164,8 @@ const Shop = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
-             {/* Search Bar */}
-             <div className="flex items-center gap-3 bg-white/[0.02] border border-white/10 rounded-none px-6 py-4 min-w-[280px] flex-1 md:flex-none focus-within:border-primary/50 transition-colors">
+            {/* Search Bar */}
+            <div className="flex items-center gap-3 bg-white/[0.02] border border-white/10 rounded-none px-6 py-4 min-w-[280px] flex-1 md:flex-none focus-within:border-primary/50 transition-colors">
               <HiSearch className="text-primary text-xl" />
               <input
                 type="text"
@@ -190,12 +190,12 @@ const Shop = () => {
         <div className={`overflow-hidden transition-all duration-700 ease-in-out mb-16 ${showFilters ? 'max-h-[800px] opacity-100 visible' : 'max-h-0 opacity-0 invisible'}`}>
           <div className="bg-white/[0.01] border border-white/5 backdrop-blur-3xl p-8 lg:p-12">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-10">
-              
+
               {/* Category & Brand */}
               <div className="space-y-6">
                 <div className="space-y-3">
                   <label className="flex items-center gap-2 text-white/30 text-[0.55rem] font-bold uppercase tracking-[0.3em] ml-1"><HiFilter /> Category</label>
-                  <select 
+                  <select
                     className="w-full bg-white/[0.03] border border-white/10 text-white p-3 text-[0.65rem] uppercase tracking-[0.1em] outline-none hover:border-white/30 transition-colors"
                     value={category}
                     onChange={(e) => { setCategory(e.target.value); setPage(1); }}
@@ -208,7 +208,7 @@ const Shop = () => {
                 </div>
                 <div className="space-y-3">
                   <label className="flex items-center gap-2 text-white/30 text-[0.55rem] font-bold uppercase tracking-[0.3em] ml-1"><HiSortDescending /> Brand</label>
-                  <select 
+                  <select
                     className="w-full bg-white/[0.03] border border-white/10 text-white p-3 text-[0.65rem] uppercase tracking-[0.1em] outline-none hover:border-white/30 transition-colors"
                     value={brand}
                     onChange={(e) => { setBrand(e.target.value); setPage(1); }}
@@ -223,7 +223,7 @@ const Shop = () => {
               <div className="space-y-6">
                 <div className="space-y-3">
                   <label className="flex items-center gap-2 text-white/30 text-[0.55rem] font-bold uppercase tracking-[0.3em] ml-1"><HiHashtag /> Accord / Chord</label>
-                  <select 
+                  <select
                     className="w-full bg-white/[0.03] border border-white/10 text-white p-3 text-[0.65rem] uppercase tracking-[0.1em] outline-none hover:border-white/30 transition-colors"
                     value={accord}
                     onChange={(e) => { setAccord(e.target.value); setPage(1); }}
@@ -234,7 +234,7 @@ const Shop = () => {
                 </div>
                 <div className="space-y-3">
                   <label className="flex items-center gap-2 text-white/30 text-[0.55rem] font-bold uppercase tracking-[0.3em] ml-1"><HiBeaker /> Specific Note</label>
-                  <select 
+                  <select
                     className="w-full bg-white/[0.03] border border-white/10 text-white p-3 text-[0.65rem] uppercase tracking-[0.1em] outline-none hover:border-white/30 transition-colors"
                     value={note}
                     onChange={(e) => { setNote(e.target.value); setPage(1); }}
@@ -250,16 +250,16 @@ const Shop = () => {
                 <div className="space-y-3">
                   <label className="flex items-center gap-2 text-white/30 text-[0.55rem] font-bold uppercase tracking-[0.3em] ml-1"><HiCurrencyDollar /> Price Range</label>
                   <div className="grid grid-cols-2 gap-3">
-                    <input 
-                      type="number" 
-                      placeholder="Min" 
+                    <input
+                      type="number"
+                      placeholder="Min"
                       className="bg-white/[0.03] border border-white/10 text-white p-3 text-[0.65rem] outline-none hover:border-white/30"
                       value={minPrice}
                       onChange={(e) => { setMinPrice(e.target.value); setPage(1); }}
                     />
-                    <input 
-                      type="number" 
-                      placeholder="Max" 
+                    <input
+                      type="number"
+                      placeholder="Max"
                       className="bg-white/[0.03] border border-white/10 text-white p-3 text-[0.65rem] outline-none hover:border-white/30"
                       value={maxPrice}
                       onChange={(e) => { setMaxPrice(e.target.value); setPage(1); }}
@@ -268,7 +268,7 @@ const Shop = () => {
                 </div>
                 <div className="space-y-3">
                   <label className="text-white/30 text-[0.55rem] font-bold uppercase tracking-[0.3em] ml-1">Volume (ml)</label>
-                  <select 
+                  <select
                     className="w-full bg-white/[0.03] border border-white/10 text-white p-3 text-[0.65rem] uppercase tracking-[0.1em] outline-none hover:border-white/30 transition-colors"
                     value={volume}
                     onChange={(e) => { setVolume(e.target.value); setPage(1); }}
@@ -288,7 +288,7 @@ const Shop = () => {
                 <p className="text-text-muted text-[0.55rem] font-bold tracking-[0.2em] mb-2 uppercase">
                   {totalItems} results for your profile
                 </p>
-                <button 
+                <button
                   onClick={clearFilters}
                   className="w-full py-4 text-accent-gold border border-accent-gold/20 hover:bg-accent-gold hover:text-black hover:border-accent-gold text-[0.6rem] font-bold uppercase tracking-[0.4em] transition-all"
                 >
@@ -308,20 +308,20 @@ const Shop = () => {
               {fragrances.map((f) => (
                 <div key={f._id} className="relative group/item">
                   <FragranceCard fragrance={mapFragranceData(f)} />
-                  
+
                   {isAdmin && (
                     <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
-                       {!f.isVisible && (
-                         <span className="bg-red-500 text-white text-[0.5rem] font-bold px-2 py-1 uppercase tracking-tighter self-end mb-2">Hidden</span>
-                       )}
-                       <div className="flex gap-2">
+                      {!f.isVisible && (
+                        <span className="bg-red-500 text-white text-[0.5rem] font-bold px-2 py-1 uppercase tracking-tighter self-end mb-2">Hidden</span>
+                      )}
+                      <div className="flex gap-2">
                         <button onClick={(e) => handleToggleVisibility(e, f._id)} className="w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-md border border-white/10 text-white hover:bg-primary transition-all">
                           {f.isVisible ? <HiEye className="w-3.5 h-3.5" /> : <HiEyeOff className="w-3.5 h-3.5" />}
                         </button>
                         <button onClick={(e) => handleDelete(e, f._id)} className="w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-md border border-white/10 text-white hover:bg-red-600 transition-all">
                           <HiTrash className="w-3.5 h-3.5" />
                         </button>
-                       </div>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -11,6 +11,11 @@ const FragranceCard = ({ fragrance, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
 
+  // Normalize data keys (handles both external API and internal DB formats)
+  const name = fragrance.name || fragrance.Name;
+  const brand = fragrance.brand || fragrance.Brand;
+  const price = fragrance.price || fragrance.Price;
+  const image = fragrance.image || fragrance['Image URL'];
   const rating = parseFloat(fragrance.rating) || 0;
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
@@ -52,17 +57,17 @@ const FragranceCard = ({ fragrance, onSelect }) => {
     >
       {/* Image Container */}
       <div className="relative block aspect-[3/4] overflow-hidden bg-gradient-to-br from-white/5 to-white/[0.02]">
-        {!imgError && fragrance['Image URL'] ? (
+        {!imgError && image ? (
           <img
-            src={fragrance['Image URL']}
-            alt={fragrance.Name}
+            src={image}
+            alt={name}
             className={`w-full h-full object-contain p-8 transition-all duration-700 ${isHovered ? 'scale-110 brightness-100' : 'scale-100 brightness-90'}`}
             onError={() => setImgError(true)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <span className="text-white/20 text-6xl font-display italic">
-              {fragrance.Name?.charAt(0) || 'F'}
+              {name?.charAt(0) || 'F'}
             </span>
           </div>
         )}
@@ -102,12 +107,12 @@ const FragranceCard = ({ fragrance, onSelect }) => {
       <div className={`flex flex-col flex-1 p-6 text-center transition-all duration-500 ${isHovered ? 'bg-white/[0.02]' : 'bg-transparent'}`}>
         {/* Brand */}
         <p className="font-luxury text-accent-gold/80 text-[0.55rem] uppercase tracking-[0.5em] mb-2 group-hover:text-accent-gold transition-colors">
-          {fragrance.Brand}
+          {brand}
         </p>
 
         {/* Name */}
         <h3 className="text-white font-display text-lg lg:text-xl leading-snug mb-2 line-clamp-1">
-          {fragrance.Name}
+          {name}
         </h3>
 
         {/* Year & Country */}
@@ -155,9 +160,9 @@ const FragranceCard = ({ fragrance, onSelect }) => {
 
         {/* Price */}
         <div className="mt-auto">
-          {fragrance.Price && (
+          {price && (
             <span className="text-xl font-display font-semibold text-white">
-              ${parseFloat(fragrance.Price).toFixed(2)}
+              ${parseFloat(price).toFixed(2)}
             </span>
           )}
         </div>

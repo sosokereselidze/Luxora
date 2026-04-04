@@ -5,6 +5,41 @@ const Product = require('./models/Product');
 const Fragrance = require('./models/Fragrance');
 const fragranceService = require('./services/fragranceService');
 
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400';
+
+const fetchWithTimeout = (url, timeout = 5000) => {
+  return new Promise((resolve, reject) => {
+    const https = require('https');
+    const req = https.get(url, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        fetchWithTimeout(res.headers.location, timeout).then(resolve).catch(reject);
+      } else if (res.statusCode === 200) {
+        resolve(true);
+      } else {
+        reject(new Error(`Status ${res.statusCode}`));
+      }
+    });
+    req.on('error', reject);
+    req.setTimeout(timeout, () => {
+      req.destroy();
+      reject(new Error('Timeout'));
+    });
+  });
+};
+
+const validateImage = async (imageUrl) => {
+  if (!imageUrl || typeof imageUrl !== 'string') return DEFAULT_IMAGE;
+  if (imageUrl.includes('images.unsplash.com') || imageUrl.includes('fragella')) {
+    try {
+      await fetchWithTimeout(imageUrl, 5000);
+      return imageUrl;
+    } catch {
+      return DEFAULT_IMAGE;
+    }
+  }
+  return imageUrl;
+};
+
 const BRANDS_TO_SEED = ['Chanel', 'Dior', 'Creed', 'Tom Ford', 'Yves Saint Laurent', 'Parfums de Marly'];
 
 const seedDB = async () => {
@@ -43,24 +78,28 @@ const seedDB = async () => {
 
     // 3. Map and Insert into MongoDB
     console.log(`📦 Importing ${allFragrances.length} real fragrances into Boutique...`);
-    const importData = allFragrances.map(f => ({
-      id: f.id,
-      name: f.Name || f.name,
-      brand: f.Brand || f.brand,
-      image: f['Image URL'] || f.image || f.thumbnail,
-      description: f.Description || f.description || `A premium fragrance by ${f.Brand || f.brand}`,
-      topNotes: f['Top Notes'] || f.topNotes || [],
-      middleNotes: f['Middle Notes'] || f.middleNotes || [],
-      baseNotes: f['Base Notes'] || f.baseNotes || [],
-      accords: f['Main Accords'] || f.accords || [],
-      price: parseFloat(f.Price) || (Math.random() * 150 + 100).toFixed(2), // API often lacks price
-      category: f.Gender || f.gender || 'Unisex',
-      isVisible: true,
-      featured: Math.random() > 0.7
-    }));
-
-    // Use a loop to handle potential unique ID conflicts if the API returns duplicates across searches
-    for (const frag of importData) {
+    
+    for (const f of allFragrances) {
+      const image = f['Image URL'] || f.image || f.thumbnail;
+      const validatedImage = await validateImage(image);
+      
+      const frag = {
+        id: f.id,
+        name: f.Name || f.name,
+        brand: f.Brand || f.brand,
+        image: validatedImage,
+        description: f.Description || f.description || `A premium fragrance by ${f.Brand || f.brand}`,
+        topNotes: f['Top Notes'] || f.topNotes || [],
+        middleNotes: f['Middle Notes'] || f.middleNotes || [],
+        baseNotes: f['Base Notes'] || f.baseNotes || [],
+        accords: f['Main Accords'] || f.accords || [],
+        price: parseFloat(f.Price) || (Math.random() * 150 + 100).toFixed(2),
+        category: f.Gender || f.gender || 'Unisex',
+        volume: f.Volume || f.volume || '100ml',
+        isVisible: true,
+        featured: Math.random() > 0.7
+      };
+      
       try {
         await Fragrance.findOneAndUpdate(
           frag.id ? { id: frag.id } : { name: frag.name, brand: frag.brand },
@@ -68,7 +107,7 @@ const seedDB = async () => {
           { upsert: true, new: true }
         );
       } catch (e) {
-        // Skip duplicates
+        // Skip duplicates/errors
       }
     }
 
