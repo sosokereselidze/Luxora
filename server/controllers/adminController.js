@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Product = require('../models/Product');
+const Fragrance = require('../models/Fragrance');
 const Order = require('../models/Order');
 
 // ─── Dashboard Stats ─────────────────────────────────────────────────────────
@@ -129,23 +130,29 @@ exports.deleteUser = async (req, res) => {
 // @route   GET /api/admin/reviews
 exports.getAllReviews = async (req, res) => {
   try {
-    const products = await Product.find({ 'reviews.0': { $exists: true } })
+    const productsPromise = Product.find({ 'reviews.0': { $exists: true } })
+      .select('name brand reviews image');
+    const fragrancesPromise = Fragrance.find({ 'reviews.0': { $exists: true } })
       .select('name brand reviews image');
 
+    const [products, fragrances] = await Promise.all([productsPromise, fragrancesPromise]);
+    const allItems = [...products, ...fragrances];
+
     const reviews = [];
-    products.forEach(product => {
-      product.reviews.forEach(review => {
+    allItems.forEach(item => {
+      item.reviews.forEach(review => {
         reviews.push({
           _id: review._id,
-          productId: product._id,
-          productName: product.name,
-          productBrand: product.brand,
-          productImage: product.image,
+          productId: item._id,
+          productName: item.name,
+          productBrand: item.brand,
+          productImage: item.image,
           name: review.name,
           rating: review.rating,
           comment: review.comment,
           user: review.user,
-          createdAt: review.createdAt
+          createdAt: review.createdAt,
+          isFragrance: !!item.volume // Simple check to know it's from Fragrances collection if we ever need it
         });
       });
     });
@@ -161,18 +168,23 @@ exports.getAllReviews = async (req, res) => {
 // @route   DELETE /api/admin/reviews/:productId/:reviewId
 exports.deleteReview = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId);
-    if (!product) return res.status(404).json({ message: 'Product not found' });
+    // Try finding in both collections
+    let itemToUpdate = await Product.findById(req.params.productId);
+    if (!itemToUpdate) {
+      itemToUpdate = await Fragrance.findById(req.params.productId);
+    }
+    
+    if (!itemToUpdate) return res.status(404).json({ message: 'Product or Fragrance not found' });
 
-    product.reviews = product.reviews.filter(
+    itemToUpdate.reviews = itemToUpdate.reviews.filter(
       r => r._id.toString() !== req.params.reviewId
     );
-    product.numReviews = product.reviews.length;
-    product.rating = product.reviews.length
-      ? product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.reviews.length
-      : 0;
+    itemToUpdate.numReviews = itemToUpdate.reviews.length;
+    itemToUpdate.rating = itemToUpdate.reviews.length
+      ? itemToUpdate.reviews.reduce((acc, r) => acc + r.rating, 0) / itemToUpdate.reviews.length
+      : 5;
 
-    await product.save();
+    await itemToUpdate.save();
     res.json({ message: 'Review removed' });
   } catch (error) {
     res.status(500).json({ message: error.message });

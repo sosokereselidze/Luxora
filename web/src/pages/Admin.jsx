@@ -24,7 +24,7 @@ const Admin = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => { logout(); navigate('/admin/login'); };
+  const handleLogout = () => { logout(); navigate('/'); };
 
   const SIDEBAR_W = sidebarOpen ? '240px' : '64px';
 

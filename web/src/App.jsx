@@ -16,7 +16,6 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Auth from './pages/Auth';
 import Admin from './pages/Admin';
-import AdminLogin from './pages/AdminLogin';
 import FragranceExplorer from './pages/FragranceExplorer';
 
 // Protected Route — any logged-in user
@@ -28,12 +27,12 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   return children;
 };
 
-// Admin Route — redirects non-admins to /admin/login
+// Admin Route — redirects non-admins to main home page
 const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
-  if (!user) return <Navigate to="/admin/login" />;
-  if (user.role !== 'admin') return <Navigate to="/admin/login" />;
+  if (!user) return <Navigate to="/" />;
+  if (user.role !== 'admin') return <Navigate to="/" />;
   return children;
 };
 
@@ -73,7 +72,6 @@ const AppInner = () => {
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
 
           {/* Admin routes — no Navbar/Footer */}
-          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
           <Route path="/admin/*" element={<AdminRoute><Admin /></AdminRoute>} />
         </Routes>

@@ -57,6 +57,27 @@ const fragranceSchema = new mongoose.Schema({
   sold: {
     type: Number,
     default: 0
+  },
+  reviews: [{
+    name: { type: String, required: true },
+    rating: { type: Number, required: true, min: 1, max: 5 },
+    comment: { type: String, required: true },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User'
+    },
+    createdAt: { type: Date, default: Date.now }
+  }],
+  rating: {
+    type: Number,
+    default: 5.0,
+    min: 0,
+    max: 5
+  },
+  numReviews: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true

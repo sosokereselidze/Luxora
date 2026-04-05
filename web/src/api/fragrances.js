@@ -53,3 +53,6 @@ export const getStoredAccords = () =>
 
 export const getStoredNotes = () =>
   apiClient.get('/fragrances/store/notes');
+
+export const createFragranceReview = (id, data) =>
+  apiClient.post(`/fragrances/store/${id}/reviews`, data);

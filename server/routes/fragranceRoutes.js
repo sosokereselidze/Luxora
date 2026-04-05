@@ -19,7 +19,8 @@ const {
   getBrandFragrances,
   searchNotes,
   searchAccords,
-  getUsage
+  getUsage,
+  createFragranceReview
 } = require('../controllers/fragranceController');
 
 // Public Fragella API proxy routes
@@ -37,6 +38,9 @@ router.get('/store/brands', getStoredBrands);
 router.get('/store/accords', getStoredAccords);
 router.get('/store/notes', getStoredNotes);
 router.get('/store/:id', getStoredFragrance);
+
+// User routes (Logged in users can leave reviews)
+router.post('/store/:id/reviews', protect, createFragranceReview);
 
 // Admin routes - import, manage, visibility
 router.post('/import', protect, admin, importFragrances);

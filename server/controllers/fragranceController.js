@@ -340,6 +340,41 @@ exports.deleteStoredFragrance = async (req, res) => {
   }
 };
 
+// @desc    Add review to stored fragrance
+// @route   POST /api/fragrances/store/:id/reviews
+exports.createFragranceReview = async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    const fragrance = await Fragrance.findById(req.params.id);
+
+    if (!fragrance) return res.status(404).json({ message: 'Fragrance not found' });
+
+    const alreadyReviewed = fragrance.reviews.find(
+      (r) => r.user.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+      return res.status(400).json({ message: 'You have already reviewed this fragrance' });
+    }
+
+    const review = {
+      name: req.user.name,
+      rating: Number(rating),
+      comment,
+      user: req.user._id,
+    };
+
+    fragrance.reviews.push(review);
+    fragrance.numReviews = fragrance.reviews.length;
+    fragrance.rating = fragrance.reviews.reduce((acc, item) => item.rating + acc, 0) / fragrance.reviews.length;
+
+    await fragrance.save();
+    res.status(201).json({ message: 'Review added successfully', fragrance });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Get all unique brands in stored fragrances
 // @route   GET /api/fragrances/store/brands
 exports.getStoredBrands = async (req, res) => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getProduct, createReview } from '../api/products';
-import { getStoredFragrance } from '../api/fragrances';
+import { getStoredFragrance, createFragranceReview } from '../api/fragrances';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import Loading from '../components/Loading';
@@ -46,7 +46,8 @@ const ProductDetails = () => {
             accords: data.accords || data['Main Accords'] || [],
             topNotes: data.topNotes || data['Top Notes'] || [],
             middleNotes: data.middleNotes || data['Middle Notes'] || data['Heart Notes'] || [],
-            baseNotes: data.baseNotes || data['Base Notes'] || []
+            baseNotes: data.baseNotes || data['Base Notes'] || [],
+            isFragranceStore: true
           };
         }
         setProduct(responseData);
@@ -91,7 +92,12 @@ const ProductDetails = () => {
 
     setSubmittingReview(true);
     try {
-      await createReview(id, { rating, comment });
+      if (product.isFragranceStore) {
+        await createFragranceReview(product._id || id, { rating, comment });
+      } else {
+        await createReview(id, { rating, comment });
+      }
+      
       toast.success('Review submitted successfully!', {
         style: {
           background: '#0a0a0f',
@@ -107,9 +113,20 @@ const ProductDetails = () => {
       });
       setComment('');
       setRating(5);
+      
       // Refresh product data
-      const { data } = await getProduct(id);
-      setProduct(data);
+      if (product.isFragranceStore) {
+        const { data } = await getStoredFragrance(product._id || id);
+        setProduct({
+          ...product,
+          reviews: data.reviews,
+          numReviews: data.numReviews,
+          rating: data.rating
+        });
+      } else {
+        const { data } = await getProduct(id);
+        setProduct(data);
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Error submitting review');
     } finally {
