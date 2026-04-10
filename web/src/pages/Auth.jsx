@@ -8,6 +8,7 @@ import { HiMail, HiLockClosed, HiUser, HiArrowRight } from 'react-icons/hi';
 const Auth = ({ isRegister = false }) => {
   const [formData, setFormData] = useState({
     name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -43,7 +44,7 @@ const Auth = ({ isRegister = false }) => {
         if (formData.password !== formData.confirmPassword) {
           throw new Error('Passwords do not match');
         }
-        await register(formData.name, formData.email, formData.password);
+        await register(formData.name, formData.username, formData.email, formData.password);
         toast.success('Welcome to Luxora!');
       } else {
         const data = await login(formData.email, formData.password);
@@ -84,26 +85,44 @@ const Auth = ({ isRegister = false }) => {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-10">
             {isRegister && (
-              <div className="relative group">
-                <input 
-                  type="text" 
-                  name="name"
-                  placeholder=" " 
-                  className="peer w-full bg-transparent border-b border-white/20 py-3 pl-10 text-white text-sm focus:border-accent-gold outline-none transition-colors"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-                <label className={`absolute left-10 transition-all cursor-text z-0 pointer-events-none peer-focus:-top-5 peer-focus:text-[0.6rem] peer-focus:text-accent-gold peer-focus:font-bold peer-focus:tracking-widest peer-focus:uppercase ${formData.name ? '-top-5 text-[0.6rem] text-white/60 uppercase tracking-widest' : 'top-3 text-sm text-white/40 font-light'}`}>
-                  Full Name
-                </label>
-                <HiUser className="absolute left-1 top-3 text-white/30 text-xl transition-all peer-focus:text-accent-gold" />
-              </div>
+              <>
+                <div className="relative group">
+                  <input 
+                    type="text" 
+                    name="name"
+                    placeholder=" " 
+                    className="peer w-full bg-transparent border-b border-white/20 py-3 pl-10 text-white text-sm focus:border-accent-gold outline-none transition-colors"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
+                  <label className={`absolute left-10 transition-all cursor-text z-0 pointer-events-none peer-focus:-top-5 peer-focus:text-[0.6rem] peer-focus:text-accent-gold peer-focus:font-bold peer-focus:tracking-widest peer-focus:uppercase ${formData.name ? '-top-5 text-[0.6rem] text-white/60 uppercase tracking-widest' : 'top-3 text-sm text-white/40 font-light'}`}>
+                    Full Name
+                  </label>
+                  <HiUser className="absolute left-1 top-3 text-white/30 text-xl transition-all peer-focus:text-accent-gold" />
+                </div>
+
+                <div className="relative group">
+                  <input 
+                    type="text" 
+                    name="username"
+                    placeholder=" " 
+                    className="peer w-full bg-transparent border-b border-white/20 py-3 pl-10 text-white text-sm focus:border-accent-gold outline-none transition-colors"
+                    value={formData.username}
+                    onChange={handleChange}
+                    required
+                  />
+                  <label className={`absolute left-10 transition-all cursor-text z-0 pointer-events-none peer-focus:-top-5 peer-focus:text-[0.6rem] peer-focus:text-accent-gold peer-focus:font-bold peer-focus:tracking-widest peer-focus:uppercase ${formData.username ? '-top-5 text-[0.6rem] text-white/60 uppercase tracking-widest' : 'top-3 text-sm text-white/40 font-light'}`}>
+                    Unique Username
+                  </label>
+                  <HiUser className="absolute left-1 top-3 text-white/30 text-xl transition-all peer-focus:text-accent-gold" />
+                </div>
+              </>
             )}
 
             <div className="relative group">
               <input 
-                type="email" 
+                type={isRegister ? "email" : "text"} 
                 name="email"
                 placeholder=" " 
                 className="peer w-full bg-transparent border-b border-white/20 py-3 pl-10 text-white text-sm focus:border-accent-gold outline-none transition-colors"
@@ -112,7 +131,7 @@ const Auth = ({ isRegister = false }) => {
                 required
               />
               <label className={`absolute left-10 transition-all cursor-text z-0 pointer-events-none peer-focus:-top-5 peer-focus:text-[0.6rem] peer-focus:text-accent-gold peer-focus:font-bold peer-focus:tracking-widest peer-focus:uppercase ${formData.email ? '-top-5 text-[0.6rem] text-white/60 uppercase tracking-widest' : 'top-3 text-sm text-white/40 font-light'}`}>
-                Email Address
+                {isRegister ? 'Email Address' : 'Email or Username'}
               </label>
               <HiMail className="absolute left-1 top-3 text-white/30 text-xl transition-all peer-focus:text-accent-gold" />
             </div>

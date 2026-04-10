@@ -86,18 +86,20 @@ exports.getUser = async (req, res) => {
 // @route   PUT /api/admin/users/:id
 exports.updateUser = async (req, res) => {
   try {
-    const { role, name, email } = req.body;
+    const { role, name, email, username } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     if (role) user.role = role;
     if (name) user.name = name;
     if (email) user.email = email;
+    if (username !== undefined) user.username = username ? username.toLowerCase().trim() : undefined;
 
     const updatedUser = await user.save();
     res.json({
       _id: updatedUser._id,
       name: updatedUser.name,
+      username: updatedUser.username,
       email: updatedUser.email,
       role: updatedUser.role,
       createdAt: updatedUser.createdAt

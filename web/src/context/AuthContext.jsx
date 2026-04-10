@@ -28,8 +28,8 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const register = async (name, email, password) => {
-    const data = await authApi.register(name, email, password);
+  const register = async (name, username, email, password) => {
+    const data = await authApi.register(name, username, email, password);
     setUser(data);
     localStorage.setItem('luxora_user', JSON.stringify(data));
     return data;

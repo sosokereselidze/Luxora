@@ -33,7 +33,8 @@ const AdminUsers = () => {
 
   const filtered = users.filter(u =>
     u.name.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase())
+    u.email.toLowerCase().includes(search.toLowerCase()) ||
+    (u.username && u.username.toLowerCase().includes(search.toLowerCase()))
   );
 
   const S = {
@@ -81,10 +82,10 @@ const AdminUsers = () => {
         ) : (
           <table style={{ width:'100%', borderCollapse:'collapse' }}>
             <thead>
-              <tr>{['Avatar','Name','Email','Role','Joined','Actions'].map(h => <th key={h} style={S.th}>{h}</th>)}</tr>
+              <tr>{['Avatar','Name','Username','Email','Role','Joined','Actions'].map(h => <th key={h} style={S.th}>{h}</th>)}</tr>
             </thead>
             <tbody>
-              {filtered.length === 0 && <tr><td colSpan="6" style={{...S.td, textAlign:'center', padding:'48px', color:'rgba(255,255,255,0.2)'}}>No users found</td></tr>}
+              {filtered.length === 0 && <tr><td colSpan="7" style={{...S.td, textAlign:'center', padding:'48px', color:'rgba(255,255,255,0.2)'}}>No users found</td></tr>}
               {filtered.map(u => {
                 const initials = u.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
                 const isAdmin = u.role === 'admin';
@@ -94,6 +95,7 @@ const AdminUsers = () => {
                       <div style={{ width:38, height:38, borderRadius:'50%', background:`linear-gradient(135deg, ${isAdmin ? '#c9a96e' : '#6366f1'}, ${isAdmin ? '#e8d5a3' : '#818cf8'})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'13px', fontWeight:'700', color:'#050508' }}>{initials}</div>
                     </td>
                     <td style={S.td}><span style={{ color:'#f8f4ff', fontWeight:'600' }}>{u.name}</span></td>
+                    <td style={S.td}><span style={{ color:'#c9a96e', fontSize:'12px', fontStyle:'italic' }}>{u.username ? `@${u.username}` : '—'}</span></td>
                     <td style={S.td}><span style={{ color:'rgba(255,255,255,0.45)', fontSize:'12px' }}>{u.email}</span></td>
                     <td style={S.td}>
                       <span style={{ padding:'4px 10px', fontSize:'10px', fontWeight:'700', letterSpacing:'0.15em', textTransform:'uppercase', background: isAdmin ? 'rgba(201,169,110,0.12)' : 'rgba(99,102,241,0.12)', color: isAdmin ? '#c9a96e' : '#818cf8', border:`1px solid ${isAdmin ? 'rgba(201,169,110,0.25)' : 'rgba(99,102,241,0.25)'}` }}>

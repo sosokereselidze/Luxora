@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
 import { getAdminStats } from '../../api/admin';
+import { useSocket } from '../../context/SocketContext';
+import toast from 'react-hot-toast';
 
 const StatCard = ({ label, value, sub, icon, color }) => (
   <div style={{
@@ -23,10 +24,49 @@ const StatCard = ({ label, value, sub, icon, color }) => (
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const socket = useSocket();
 
   useEffect(() => {
     getAdminStats().then(r => { setStats(r.data); setLoading(false); }).catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('new-order', (data) => {
+        // Show Luxury Notification
+        toast.success(`New Order from ${data.userName}: $${data.totalPrice.toFixed(2)}`, {
+          duration: 6000,
+          position: 'top-right',
+          style: {
+            background: '#0a0a0f',
+            color: '#c9a96e',
+            border: '1px solid #c9a96e',
+            borderRadius: '0',
+            padding: '16px 24px',
+            fontFamily: '"Montserrat", sans-serif',
+            fontSize: '12px',
+            letterSpacing: '0.1em',
+            fontWeight: '600',
+            textTransform: 'uppercase'
+          },
+          icon: '✨'
+        });
+
+        // Update stats real-time
+        setStats(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            totalOrders: prev.totalOrders + 1,
+            pendingOrders: prev.pendingOrders + 1,
+            totalRevenue: prev.totalRevenue + data.totalPrice
+          };
+        });
+      });
+
+      return () => socket.off('new-order');
+    }
+  }, [socket]);
 
   if (loading) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'300px' }}>

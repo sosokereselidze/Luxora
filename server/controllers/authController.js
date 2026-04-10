@@ -10,19 +10,28 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, username } = req.body;
 
-    // Check if user exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    // Check if user exists by email
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
       return res.status(400).json({ message: 'User already exists with this email' });
     }
 
-    const user = await User.create({ name, email, password });
+    // Check if user exists by username
+    if (username) {
+      const existingUsername = await User.findOne({ username: username.toLowerCase().trim() });
+      if (existingUsername) {
+        return res.status(400).json({ message: 'Username is already taken' });
+      }
+    }
+
+    const user = await User.create({ name, email, password, username: username ? username.toLowerCase().trim() : undefined });
 
     res.status(201).json({
       _id: user._id,
       name: user.name,
+      username: user.username,
       email: user.email,
       role: user.role,
       token: generateToken(user._id)
@@ -38,11 +47,11 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Support login by email or by username (name field)
+    // Support login by email or by username
     const isEmail = email && email.includes('@');
     const query = isEmail
       ? { email: email.toLowerCase().trim() }
-      : { name: email.trim() };
+      : { username: email.toLowerCase().trim() };
 
     const user = await User.findOne(query).select('+password');
     if (!user) {
@@ -57,6 +66,7 @@ exports.login = async (req, res) => {
     res.json({
       _id: user._id,
       name: user.name,
+      username: user.username,
       email: user.email,
       role: user.role,
       token: generateToken(user._id)
@@ -74,6 +84,7 @@ exports.getMe = async (req, res) => {
     res.json({
       _id: user._id,
       name: user.name,
+      username: user.username,
       email: user.email,
       role: user.role
     });
@@ -114,9 +125,19 @@ exports.googleLogin = async (req, res) => {
       const crypto = require('crypto');
       const randomPassword = crypto.randomBytes(32).toString('hex');
       
+      // Auto-generate a unique username from email
+      let baseUsername = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+      let uniqueUsername = baseUsername;
+      let counter = 1;
+      while (await User.findOne({ username: uniqueUsername })) {
+        uniqueUsername = `${baseUsername}${counter}`;
+        counter++;
+      }
+      
       user = await User.create({
         name,
         email,
+        username: uniqueUsername,
         password: randomPassword,
         googleId
       });
@@ -125,6 +146,7 @@ exports.googleLogin = async (req, res) => {
     res.json({
       _id: user._id,
       name: user.name,
+      username: user.username,
       email: user.email,
       role: user.role,
       token: generateToken(user._id)

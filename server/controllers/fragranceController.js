@@ -1,5 +1,6 @@
 const fragranceService = require('../services/fragranceService');
 const Fragrance = require('../models/Fragrance');
+const socketIO = require('../socket');
 
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400';
 
@@ -369,6 +370,20 @@ exports.createFragranceReview = async (req, res) => {
     fragrance.rating = fragrance.reviews.reduce((acc, item) => item.rating + acc, 0) / fragrance.reviews.length;
 
     await fragrance.save();
+
+    // Emit real-time review update
+    try {
+      const io = socketIO.getIO();
+      io.to(`product-${req.params.id}`).emit('new-review', {
+        productId: req.params.id,
+        review: fragrance.reviews[fragrance.reviews.length - 1],
+        numReviews: fragrance.numReviews,
+        rating: fragrance.rating
+      });
+    } catch (err) {
+      console.error('Socket error in fragrance review:', err.message);
+    }
+
     res.status(201).json({ message: 'Review added successfully', fragrance });
   } catch (error) {
     res.status(500).json({ message: error.message });

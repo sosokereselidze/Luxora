@@ -11,6 +11,8 @@ dotenv.config();
 connectDB();
 
 const app = express();
+const httpServer = require('http').createServer(app);
+const io = require('./socket').init(httpServer);
 
 // Body parser
 app.use(express.json());
@@ -51,7 +53,7 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, async () => {
+httpServer.listen(PORT, async () => {
   console.log(`🚀 Luxora Server running on port ${PORT}`);
   console.log(`📡 API: http://localhost:${PORT}/api`);
 

@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const socketIO = require('../socket');
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -164,6 +165,20 @@ exports.createProductReview = async (req, res) => {
         product.reviews.length;
 
       await product.save();
+
+      // Emit real-time review update
+      try {
+        const io = socketIO.getIO();
+        io.to(`product-${req.params.id}`).emit('new-review', {
+          productId: req.params.id,
+          review: product.reviews[product.reviews.length - 1],
+          numReviews: product.numReviews,
+          rating: product.rating
+        });
+      } catch (err) {
+        console.error('Socket error in review:', err.message);
+      }
+
       res.status(201).json({ message: 'Review added' });
     } else {
       res.status(404).json({ message: 'Product not found' });

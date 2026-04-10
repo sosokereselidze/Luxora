@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavig
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { SocketProvider } from './context/SocketContext';
 
 // Components
 import Navbar from './components/Navbar';
@@ -86,7 +87,9 @@ function App() {
     <Router>
       <AuthProvider>
         <CartProvider>
-          <AppInner />
+          <SocketProvider>
+            <AppInner />
+          </SocketProvider>
         </CartProvider>
       </AuthProvider>
     </Router>

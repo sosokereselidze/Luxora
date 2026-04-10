@@ -4,6 +4,7 @@ import { getProduct, createReview } from '../api/products';
 import { getStoredFragrance, createFragranceReview } from '../api/fragrances';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useSocket } from '../context/SocketContext';
 import Loading from '../components/Loading';
 import { HiStar, HiShoppingBag, HiShieldCheck, HiTruck, HiClock, HiArrowLeft } from 'react-icons/hi';
 import toast from 'react-hot-toast';
@@ -16,12 +17,43 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const socket = useSocket();
   const navigate = useNavigate();
 
   // Review states
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+
+  // Real-time review listener
+  useEffect(() => {
+    if (socket && id) {
+      socket.emit('join-product', id);
+
+      socket.on('new-review', (data) => {
+        if (data.productId === id) {
+          setProduct(prev => {
+            if (!prev) return null;
+            // Avoid duplicates if this was the user who submitted it
+            const exists = prev.reviews.some(r => r._id === data.review._id);
+            if (exists) return prev;
+            
+            return {
+              ...prev,
+              reviews: [data.review, ...prev.reviews],
+              numReviews: data.numReviews,
+              rating: data.rating
+            };
+          });
+        }
+      });
+
+      return () => {
+        socket.emit('leave-product', id);
+        socket.off('new-review');
+      };
+    }
+  }, [socket, id]);
 
 
   useEffect(() => {

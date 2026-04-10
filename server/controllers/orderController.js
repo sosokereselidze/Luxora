@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const socketIO = require('../socket');
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -17,6 +18,19 @@ exports.createOrder = async (req, res) => {
       paymentMethod,
       totalPrice
     });
+
+    // Notify Admins
+    try {
+      const io = socketIO.getIO();
+      io.emit('new-order', {
+        orderId: order._id,
+        userName: req.user.name,
+        totalPrice: order.totalPrice,
+        createdAt: order.createdAt
+      });
+    } catch (err) {
+      console.error('Socket error in order:', err.message);
+    }
 
     res.status(201).json(order);
   } catch (error) {

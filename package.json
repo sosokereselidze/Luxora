@@ -12,6 +12,7 @@
     "seed": "cd server && npm run seed"
   },
   "dependencies": {
+    "@sentry/node": "^10.47.0",
     "concurrently": "^8.2.1"
   }
 }
