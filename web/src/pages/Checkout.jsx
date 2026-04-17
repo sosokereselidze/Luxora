@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { createOrder } from '../api/orders';
+import { createOrder, initiateBogPayment } from '../api/orders';
 import toast from 'react-hot-toast';
 import { HiTruck, HiCreditCard, HiCheckCircle, HiArrowLeft, HiLockClosed } from 'react-icons/hi';
 
@@ -13,6 +13,7 @@ const Checkout = () => {
   const [formData, setFormData] = useState({
     fullName: '', address: '', city: '', postalCode: '', country: ''
   });
+  const [paymentMethod, setPaymentMethod] = useState('bog'); // Default to BOG as requested
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,11 +33,18 @@ const Checkout = () => {
           quantity: item.quantity
         })),
         shippingAddress: formData,
-        paymentMethod: 'Card',
+        paymentMethod: paymentMethod === 'bog' ? 'Bank of Georgia' : 'Card',
         totalPrice: totalPrice
       };
 
-      await createOrder(orderData);
+      const { data: order } = await createOrder(orderData);
+
+      if (paymentMethod === 'bog') {
+        const { data: bogResponse } = await initiateBogPayment(order._id);
+        window.location.href = bogResponse.checkoutUrl;
+        return; 
+      }
+
       setSuccess(true);
       clearCart();
       toast.success('Order placed successfully!', {
@@ -55,7 +63,7 @@ const Checkout = () => {
     } catch (error) {
       toast.error(error.response?.data?.message || 'Error placing order');
     } finally {
-      setLoading(false);
+      if (paymentMethod !== 'bog') setLoading(false);
     }
   };
 
@@ -128,13 +136,39 @@ const Checkout = () => {
                 <HiCreditCard className="text-2xl text-accent-gold" />
                 <h3 className="font-display text-2xl">Payment Method</h3>
               </div>
-              <p className="text-text-secondary font-light text-sm mb-10">Currently accepting Credit/Debit Card payments via secure portal.</p>
-              
-              <div className="p-8 bg-white/[0.02] border border-white/10 text-center flex flex-col items-center gap-4 border-dashed relative mb-10">
-                 <div className="w-2 h-2 bg-accent-gold rounded-none animate-pulse absolute top-4 left-4"></div>
-                 <p className="font-bold text-white text-[0.7rem] uppercase tracking-[0.3em]">Stripe Secure Portal</p>
-                 <p className="text-[0.6rem] text-white/30 uppercase tracking-[0.2em]">Transaction will be simulated for this production preview.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+                <div 
+                  onClick={() => setPaymentMethod('bog')}
+                  className={`p-6 border cursor-pointer transition-all flex flex-col gap-2 ${paymentMethod === 'bog' ? 'bg-accent-gold/5 border-accent-gold' : 'bg-white/[0.02] border-white/5 hover:border-white/20'}`}
+                >
+                  <p className="font-bold text-white text-[0.7rem] uppercase tracking-[0.3em]">Bank of Georgia</p>
+                  <p className="text-[0.6rem] text-white/30 uppercase tracking-[0.2em]">Secure payment via BOG iPay</p>
+                </div>
+                
+                <div 
+                  onClick={() => setPaymentMethod('card')}
+                  className={`p-6 border cursor-pointer transition-all flex flex-col gap-2 ${paymentMethod === 'card' ? 'bg-accent-gold/5 border-accent-gold' : 'bg-white/[0.02] border-white/5 hover:border-white/20'}`}
+                >
+                  <p className="font-bold text-white text-[0.7rem] uppercase tracking-[0.3em]">Credit/Debit Card</p>
+                  <p className="text-[0.6rem] text-white/30 uppercase tracking-[0.2em]">Secure payment via Stripe</p>
+                </div>
               </div>
+              
+              {paymentMethod === 'bog' && (
+                <div className="p-8 bg-white/[0.02] border border-white/10 text-center flex flex-col items-center gap-4 border-dashed relative mb-10 animate-fade-in">
+                   <div className="w-2 h-2 bg-accent-gold rounded-none animate-pulse absolute top-4 left-4"></div>
+                   <p className="font-bold text-white text-[0.7rem] uppercase tracking-[0.3em]">BOG iPay Portal</p>
+                   <p className="text-[0.6rem] text-white/30 uppercase tracking-[0.2em]">You will be redirected to the secure Bank of Georgia payment gateway.</p>
+                </div>
+              )}
+
+              {paymentMethod === 'card' && (
+                <div className="p-8 bg-white/[0.02] border border-white/10 text-center flex flex-col items-center gap-4 border-dashed relative mb-10 animate-fade-in">
+                   <div className="w-2 h-2 bg-accent-gold rounded-none animate-pulse absolute top-4 left-4"></div>
+                   <p className="font-bold text-white text-[0.7rem] uppercase tracking-[0.3em]">Stripe Secure Portal</p>
+                   <p className="text-[0.6rem] text-white/30 uppercase tracking-[0.2em]">Transaction will be simulated for this production preview.</p>
+                </div>
+              )}
               
               <button 
                 type="submit" 

@@ -72,7 +72,7 @@ const ExplorerScreen = ({ navigation }: any) => {
         </View>
       </View>
 
-      {results.length > 0 ? (
+      {results?.length > 0 ? (
         <FlatList 
           data={results}
           renderItem={renderItem}

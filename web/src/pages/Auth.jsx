@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
-import { HiMail, HiLockClosed, HiUser, HiArrowRight } from 'react-icons/hi';
+import { HiMail, HiLockClosed, HiUser, HiArrowRight, HiEye, HiEyeOff } from 'react-icons/hi';
 
 const Auth = ({ isRegister = false }) => {
   const [formData, setFormData] = useState({
@@ -13,6 +13,8 @@ const Auth = ({ isRegister = false }) => {
     password: '',
     confirmPassword: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login, register, googleLogin } = useAuth();
@@ -138,10 +140,10 @@ const Auth = ({ isRegister = false }) => {
 
             <div className="relative group">
               <input 
-                type="password" 
+                type={showPassword ? "text" : "password"} 
                 name="password"
                 placeholder=" " 
-                className="peer w-full bg-transparent border-b border-white/20 py-3 pl-10 text-white text-sm focus:border-accent-gold outline-none transition-colors"
+                className="peer w-full bg-transparent border-b border-white/20 py-3 pl-10 pr-10 text-white text-sm focus:border-accent-gold outline-none transition-colors"
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -150,15 +152,22 @@ const Auth = ({ isRegister = false }) => {
                 Password
               </label>
               <HiLockClosed className="absolute left-1 top-3 text-white/30 text-xl transition-all peer-focus:text-accent-gold" />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-1 top-3 text-white/20 hover:text-accent-gold transition-colors"
+              >
+                {showPassword ? <HiEyeOff className="text-lg" /> : <HiEye className="text-lg" />}
+              </button>
             </div>
 
             {isRegister && (
               <div className="relative group">
                 <input 
-                  type="password" 
+                  type={showConfirmPassword ? "text" : "password"} 
                   name="confirmPassword"
                   placeholder=" " 
-                  className="peer w-full bg-transparent border-b border-white/20 py-3 pl-10 text-white text-sm focus:border-accent-gold outline-none transition-colors"
+                  className="peer w-full bg-transparent border-b border-white/20 py-3 pl-10 pr-10 text-white text-sm focus:border-accent-gold outline-none transition-colors"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
@@ -167,6 +176,13 @@ const Auth = ({ isRegister = false }) => {
                   Confirm Password
                 </label>
                 <HiLockClosed className="absolute left-1 top-3 text-white/30 text-xl transition-all peer-focus:text-accent-gold" />
+                <button 
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-1 top-3 text-white/20 hover:text-accent-gold transition-colors"
+                >
+                  {showConfirmPassword ? <HiEyeOff className="text-lg" /> : <HiEye className="text-lg" />}
+                </button>
               </div>
             )}
 

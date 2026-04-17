@@ -52,41 +52,41 @@ const TabNavigator = () => {
         },
       }}
     >
-      <Tab.Screen 
-        name="HomeTab" 
-        component={HomeScreen} 
+      <Tab.Screen
+        name="HomeTab"
+        component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
         }}
       />
-      <Tab.Screen 
-        name="ShopTab" 
-        component={ShopScreen} 
+      <Tab.Screen
+        name="ShopTab"
+        component={ShopScreen}
         options={{
           tabBarLabel: 'Shop',
           tabBarIcon: ({ color, size }) => <ShoppingBag size={size} color={color} />,
         }}
       />
-      <Tab.Screen 
-        name="ExploreTab" 
-        component={ExplorerScreen} 
+      <Tab.Screen
+        name="ExploreTab"
+        component={ExplorerScreen}
         options={{
           tabBarLabel: 'Explore',
           tabBarIcon: ({ color, size }) => <Search size={size} color={color} />,
         }}
       />
-      <Tab.Screen 
-        name="CartTab" 
-        component={CartScreen} 
+      <Tab.Screen
+        name="CartTab"
+        component={CartScreen}
         options={{
           tabBarLabel: 'Bag',
           tabBarIcon: ({ color, size }) => <ShoppingCart size={size} color={color} />,
         }}
       />
-      <Tab.Screen 
-        name="ProfileTab" 
-        component={ProfileScreen} 
+      <Tab.Screen
+        name="ProfileTab"
+        component={ProfileScreen}
         options={{
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,

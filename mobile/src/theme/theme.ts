@@ -1,32 +1,30 @@
 export const COLORS = {
-  primary: '#6a0dad',
-  primaryDark: '#4b0082',
-  primaryDeeper: '#1c0033',
-  primaryLight: '#9b59b6',
-  primaryLighter: '#c39bd3',
-
-  accent: '#d4a5ff',
-  accentGold: '#c9a96e',
-  accentGoldLight: '#e8d5a3',
-
-  bgDark: '#050508',
-  bgSurface: '#0a0a0f',
-  bgCard: '#0f0f1a',
-  bgCardHover: '#141424',
-  bgInput: '#080812',
-
-  textPrimary: '#f8f4ff',
-  textSecondary: '#c8bdff',
-  textMuted: '#6e658a',
+  // Deep multi-dimensional backgrounds
+  bgDark: '#0A0A12',       // Deep Midnight
+  bgSurface: '#14141F',    // Slate Obsidian
+  bgCard: '#1C1C28',       // Lighter interactive card color
   
-  white: '#ffffff',
+  // Brand Signatures
+  primary: '#5E44FF',      // Electric Amethyst
+  accentGold: '#C9A96E',   // Liquid Gold
+  accentGoldLight: '#E5D1A4',
+  
+  // Text & Interface
+  white: '#FFFFFF',
+  textSecondary: '#A9A9B8', // Muted periwinkle-slate
+  textMuted: '#6D6D80',
+  error: '#FF4D4D',
+  success: '#00C853',
   black: '#000000',
-  transparent: 'transparent',
+  
+  // Translucent tokens
+  glass: 'rgba(255, 255, 255, 0.03)',
+  glassBorder: 'rgba(255, 255, 255, 0.08)',
 };
 
 export const FONTS = {
-  display: 'PlayfairDisplay-SemiBold',
-  luxury: 'Cinzel-Regular',
+  display: 'Cinzel-Regular',
+  luxury: 'PlayfairDisplay-SemiBold',
   body: 'Montserrat-Regular',
   bodyBold: 'Montserrat-Bold',
   bodyLight: 'Montserrat-Light',
@@ -39,13 +37,4 @@ export const SPACING = {
   lg: 24,
   xl: 32,
   xxl: 48,
-};
-
-export const GLOBS = {
-  borderRadius: 0, // Design uses sharp corners for luxury feel
-  glassEffect: {
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
-  }
 };

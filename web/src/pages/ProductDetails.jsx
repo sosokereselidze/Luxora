@@ -192,15 +192,6 @@ const ProductDetails = () => {
               <div className="absolute top-0 right-0 w-0 h-0 border-t-[50px] border-r-[50px] border-t-transparent border-r-white/5 group-hover:border-r-accent-gold/20 transition-all duration-700"></div>
             </div>
 
-            {/* Thumbnails row */}
-            <div className="grid grid-cols-4 gap-2 max-w-[320px] lg:max-w-[400px] mx-auto lg:mx-0">
-              <div className="aspect-square bg-white/[0.03] border border-accent-gold/50 p-2 flex items-center justify-center cursor-pointer transition-colors">
-                <img src={product.image} alt="thumbnail" className="max-w-full max-h-full object-contain" />
-              </div>
-              <div className="aspect-square bg-white/[0.01] border border-white/5 p-2 flex items-center justify-center opacity-50 hover:opacity-100 hover:bg-white/[0.02] transition-all cursor-pointer">
-                <img src={product.image} alt="thumbnail" className="max-w-full max-h-full object-contain" />
-              </div>
-            </div>
           </div>
 
           {/* Content */}

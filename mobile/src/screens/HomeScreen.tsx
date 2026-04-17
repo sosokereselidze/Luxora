@@ -11,14 +11,14 @@ import {
   FlatList,
   Animated,
   ActivityIndicator,
-  TextInput
+  StatusBar,
+  Platform
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, FONTS, SPACING } from '../theme/theme';
-import { MoveRight, Star } from 'lucide-react-native';
+import { ArrowRight, Sparkles, Star, Zap, Droplets } from 'lucide-react-native';
 import FragranceCard from '../components/FragranceCard';
-import CategoryBanner from '../components/CategoryBanner';
 import { getStoredFragrances } from '../services/fragranceService';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -41,24 +41,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Animation values
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
+  // Animation scroll value
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     fetchFeatured();
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      })
-    ]).start();
   }, []);
 
   const fetchFeatured = async () => {
@@ -74,144 +61,164 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     }
   };
 
+  // Header Parallax Interpolations
+  const headerHeight = height * 0.65;
+  const headerTranslate = scrollY.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [0, -headerHeight / 3],
+    extrapolate: 'clamp',
+  });
+  
+  const headerScale = scrollY.interpolate({
+    inputRange: [-headerHeight, 0],
+    outputRange: [1.3, 1],
+    extrapolate: 'clamp',
+  });
+
+  const StatsCard = ({ icon: Icon, value, label }: { icon: any, value: string, label: string }) => (
+    <View style={styles.statsCard}>
+      <View style={styles.statsIconCircle}>
+        <Icon size={16} color={COLORS.accentGold} />
+      </View>
+      <Text style={styles.statsValue}>{value}</Text>
+      <Text style={styles.statsLabel}>{label}</Text>
+    </View>
+  );
+
   return (
-    <View style={[styles.container, { backgroundColor: COLORS.bgDark }]}>
-      <ScrollView showsVerticalScrollIndicator={false} stickyHeaderIndices={[]}>
-        {/* Hero Section */}
-        <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      
+      <Animated.ScrollView 
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+      >
+        {/* Animated Hero Header */}
+        <Animated.View style={[styles.heroContainer, { height: headerHeight, transform: [{ translateY: headerTranslate }, { scale: headerScale }] }]}>
           <ImageBackground
-            source={{ uri: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=80' }}
-            style={[styles.hero, { height: height * 0.75 }]}
+            source={{ uri: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80' }}
+            style={styles.heroImage}
           >
             <LinearGradient
-              colors={['rgba(5,5,8,0.3)', 'rgba(5,5,8,0.1)', 'rgba(5,5,8,0.9)', COLORS.bgDark]}
-              style={styles.gradient}
+              colors={['transparent', 'rgba(10,10,18,0.4)', COLORS.bgDark]}
+              style={styles.heroGradient}
             >
-              <View style={[styles.heroContent, { paddingBottom: insets.bottom + SPACING.xl }]}>
-                <Text style={styles.heroSubtitle}>Luxora Fragrances</Text>
-                <Text style={styles.heroTitle}>THE ART OF{'\n'}<Text style={styles.italic}>MEMORY</Text></Text>
-                <Text style={styles.heroDescription}>
-                  Step into a world of rare botanicals and masterfully crafted signatures.
-                </Text>
+              <View style={[styles.heroContent, { paddingBottom: SPACING.xxl }]}>
+                <View style={styles.exclusiveBadge}>
+                  <Sparkles size={10} color={COLORS.accentGold} />
+                  <Text style={styles.exclusiveText}>PRIVATE COLLECTION</Text>
+                </View>
+                
+                <Text style={styles.heroTitle}>AROMA{'\n'}<Text style={styles.heroTitleAccent}>OF DESTINY</Text></Text>
                 
                 <TouchableOpacity 
-                  style={styles.heroButton}
+                  style={styles.discoveryBtn}
                   onPress={() => navigation.navigate('ShopTab')}
+                  activeOpacity={0.8}
                 >
-                  <Text style={styles.heroButtonText}>Explore Shop</Text>
-                  <MoveRight color={COLORS.black} size={16} />
+                  <Text style={styles.discoveryBtnText}>Discover Masteries</Text>
+                  <View style={styles.btnIconCircle}>
+                    <ArrowRight size={14} color={COLORS.black} />
+                  </View>
                 </TouchableOpacity>
               </View>
             </LinearGradient>
           </ImageBackground>
         </Animated.View>
 
-        {/* Philosophy Section */}
-        <View style={styles.philosophySection}>
-          <Text style={styles.sectionTag}>Legacy of Scent</Text>
-          <Text style={styles.philosophyText}>
-            "We believe that a fragrance is more than a scent; it's a silent language, a moment suspended in time."
-          </Text>
-          <View style={styles.divider} />
-        </View>
-
-        {/* Featured Collections */}
-        <View style={styles.sectionTitleContainer}>
-          <Text style={styles.sectionTitle}>Featured <Text style={styles.italicGold}>Collections</Text></Text>
-          <TouchableOpacity onPress={() => navigation.navigate('ShopTab')}>
-            <Text style={styles.viewAll}>View All</Text>
-          </TouchableOpacity>
-        </View>
-
-        {loading ? (
-          <ActivityIndicator color={COLORS.accentGold} style={{ marginVertical: SPACING.xl }} />
-        ) : (
-          <FlatList
-            data={featuredProducts}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item._id}
-            contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: SPACING.xl }}
-            renderItem={({ item }) => (
-              <FragranceCard 
-                fragrance={item} 
-                onPress={() => navigation.navigate('ProductDetails', { id: item._id })} 
-              />
-            )}
-          />
-        )}
-
-        {/* Experience Section */}
-        <View style={styles.experienceSection}>
-          <View style={styles.experienceImageContainer}>
-            <Image 
-              source={{ uri: 'https://images.unsplash.com/photo-1615529182904-14819c35db37?auto=format&fit=crop&q=80' }} 
-              style={styles.experienceImage}
-            />
-            <View style={styles.experienceOverlay} />
-          </View>
-          <View style={styles.experienceContent}>
-            <Text style={styles.sectionTag}>The Craftsmanship</Text>
-            <Text style={styles.experienceTitle}>Masterfully{'\n'}<Text style={styles.whiteItalic}>Blended</Text></Text>
-            <Text style={styles.experienceDescription}>
-              Every bottle of Luxora is a result of years of research, using only the rarest ingredients sourced from across the globe.
+        {/* Content Body */}
+        <View style={styles.body}>
+          {/* Introductory Section */}
+          <View style={styles.introSection}>
+            <Text style={styles.introSubtitle}>Unveiling Excellence</Text>
+            <Text style={styles.introTitle}>The Society of Scents</Text>
+            <Text style={styles.introBody}>
+              Every Luxora fragrance is a distillation of life's most profound moments, 
+              captured in a crystal vessel.
             </Text>
-            
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>150+</Text>
-                <Text style={styles.statLabel}>Rare Botanicals</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>48h</Text>
-                <Text style={styles.statLabel}>Sillage</Text>
-              </View>
-            </View>
           </View>
-        </View>
 
-        {/* Categories Banner */}
-        <View style={styles.categoriesSection}>
-          <Text style={styles.catSectionTitle}>Find Your Signature</Text>
-          <View style={[styles.divider, { alignSelf: 'center', marginBottom: SPACING.xl }]} />
-          
-          <CategoryBanner 
-            name="Pour Homme" 
-            image="https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&q=80" 
-            onPress={() => navigation.navigate('ShopTab', { category: 'Men' })}
-          />
-          <CategoryBanner 
-            name="Pour Femme" 
-            image="https://images.unsplash.com/photo-1583467875263-d50dec37a88c?auto=format&fit=crop&q=80" 
-            onPress={() => navigation.navigate('ShopTab', { category: 'Women' })}
-          />
-          <CategoryBanner 
-            name="L'Universel" 
-            image="https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=80" 
-            onPress={() => navigation.navigate('ShopTab', { category: 'Unisex' })}
-          />
-        </View>
+          {/* Stats Grid - "Olfactory Pulse" */}
+          <View style={styles.statsGrid}>
+            <StatsCard icon={Zap} value="48H" label="Enduring Sillage" />
+            <StatsCard icon={Droplets} value="100%" label="Pure Essence" />
+            <StatsCard icon={Star} value="VIP" label="Access Only" />
+          </View>
 
-        {/* Newsletter Section */}
-        <LinearGradient colors={[COLORS.bgSurface, COLORS.bgDark]} style={styles.newsletterSection}>
-          <Text style={styles.sectionTag}>The Inner Circle</Text>
-          <Text style={styles.newsletterTitle}>Join the Luxora Society</Text>
-          <Text style={styles.newsletterSub}>Subscribe for exclusive access to limited editions and private events.</Text>
-          
-          <View style={styles.inputContainer}>
-            <TextInput 
-              placeholder="Your email address" 
-              placeholderTextColor="rgba(255,255,255,0.3)"
-              style={styles.input}
-            />
-            <TouchableOpacity style={styles.subscribeBtn}>
-              <Text style={styles.subscribeBtnText}>Join</Text>
+          {/* Featured Rows */}
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.sectionTitle}>Curated <Text style={styles.accentText}>Picks</Text></Text>
+              <View style={styles.goldBar} />
+            </View>
+            <TouchableOpacity onPress={() => navigation.navigate('ShopTab')}>
+              <Text style={styles.viewAllText}>View Boutique</Text>
             </TouchableOpacity>
           </View>
-        </LinearGradient>
 
-        <View style={{ height: 100, backgroundColor: COLORS.bgDark }} />
-      </ScrollView>
+          {loading ? (
+            <ActivityIndicator color={COLORS.accentGold} style={{ marginVertical: 60 }} />
+          ) : (
+            <FlatList
+              data={featuredProducts}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item._id}
+              contentContainerStyle={styles.horizontalList}
+              snapToInterval={width * 0.65 + SPACING.lg}
+              decelerationRate="fast"
+              renderItem={({ item }) => (
+                <View style={styles.cardItemWrapper}>
+                  <FragranceCard 
+                    fragrance={item} 
+                    onPress={() => navigation.navigate('ProductDetails', { id: item._id })} 
+                  />
+                </View>
+              )}
+            />
+          )}
+
+          {/* New Interactive Categories Section */}
+          <View style={styles.categoriesSection}>
+            <Text style={styles.catLabel}>DISCOVERY TILES</Text>
+            <View style={styles.tilesContainer}>
+              <TouchableOpacity 
+                style={[styles.tile, { backgroundColor: '#1A1A2E' }]}
+                onPress={() => navigation.navigate('ShopTab', { category: 'Men' })}
+              >
+                <Image 
+                  source={{ uri: 'https://images.unsplash.com/photo-1557170334-a9632e77c6e4?auto=format&fit=crop&q=80' }}
+                  style={styles.tileImg}
+                />
+                <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={styles.tileOverlay}>
+                  <Text style={styles.tileTitle}>MASCULINE</Text>
+                  <Text style={styles.tileSub}>Power & Grace</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.tile, { backgroundColor: '#2E1A1A' }]}
+                onPress={() => navigation.navigate('ShopTab', { category: 'Women' })}
+              >
+                <Image 
+                  source={{ uri: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80' }}
+                  style={styles.tileImg}
+                />
+                <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={styles.tileOverlay}>
+                  <Text style={styles.tileTitle}>FEMININE</Text>
+                  <Text style={styles.tileSub}>Charisma & Light</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={{ height: 100 }} />
+        </View>
+      </Animated.ScrollView>
     </View>
   );
 };
@@ -219,242 +226,238 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: COLORS.bgDark,
   },
-  hero: {
+  heroContainer: {
+    width: width,
+    overflow: 'hidden',
+  },
+  heroImage: {
     width: '100%',
-    justifyContent: 'flex-end',
+    height: '100%',
   },
-  gradient: {
+  heroGradient: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'flex-end',
-    padding: SPACING.lg,
+    padding: SPACING.xl,
   },
   heroContent: {
-    marginBottom: SPACING.md,
+    width: '100%',
   },
-  heroSubtitle: {
+  exclusiveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(201, 169, 110, 0.1)',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(201, 169, 110, 0.3)',
+    gap: 8,
+    marginBottom: SPACING.lg,
+  },
+  exclusiveText: {
+    color: COLORS.accentGold,
+    fontFamily: FONTS.luxury,
+    fontSize: 9,
+    letterSpacing: 2,
+  },
+  heroTitle: {
+    color: COLORS.white,
+    fontFamily: FONTS.display,
+    fontSize: 52,
+    lineHeight: 56,
+    marginBottom: SPACING.xl,
+  },
+  heroTitleAccent: {
+    color: COLORS.accentGold,
+    fontStyle: 'italic',
+    fontWeight: '300',
+  },
+  discoveryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    paddingLeft: 24,
+    paddingRight: 8,
+    height: 54,
+    borderRadius: 27,
+    alignSelf: 'flex-start',
+    gap: 15,
+  },
+  discoveryBtnText: {
+    color: COLORS.black,
+    fontFamily: FONTS.bodyBold,
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 1.5,
+  },
+  btnIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.accentGold,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  body: {
+    backgroundColor: COLORS.bgDark,
+    marginTop: -30, // Overlap effect
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingTop: SPACING.xl,
+  },
+  introSection: {
+    paddingHorizontal: SPACING.xl,
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  introSubtitle: {
     color: COLORS.accentGold,
     fontFamily: FONTS.luxury,
     fontSize: 10,
     textTransform: 'uppercase',
     letterSpacing: 4,
-    marginBottom: SPACING.sm,
+    marginBottom: 10,
   },
-  heroTitle: {
+  introTitle: {
     color: COLORS.white,
     fontFamily: FONTS.display,
-    fontSize: 48,
-    lineHeight: 52,
-    marginBottom: SPACING.md,
+    fontSize: 28,
+    textAlign: 'center',
+    marginBottom: 15,
   },
-  italic: {
-    fontStyle: 'italic',
-    fontWeight: '300',
-    color: 'rgba(255,255,255,0.8)',
-  },
-  heroDescription: {
+  introBody: {
     color: COLORS.textSecondary,
     fontFamily: FONTS.body,
     fontSize: 14,
+    textAlign: 'center',
     lineHeight: 24,
-    marginBottom: SPACING.xl,
-    maxWidth: '85%',
+    opacity: 0.8,
   },
-  heroButton: {
-    backgroundColor: COLORS.white,
+  statsGrid: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: SPACING.xl,
+    marginBottom: 60,
+  },
+  statsCard: {
+    width: (width - SPACING.xl * 2 - 24) / 3,
+    backgroundColor: COLORS.bgSurface,
+    padding: 15,
+    borderRadius: 15,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
+  },
+  statsIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(201, 169, 110, 0.1)',
     justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    alignSelf: 'flex-start',
-    gap: 12,
-  },
-  heroButtonText: {
-    color: COLORS.black,
-    fontFamily: FONTS.bodyBold,
-    fontSize: 10,
-    textTransform: 'uppercase',
-    letterSpacing: 2,
-  },
-  philosophySection: {
-    padding: SPACING.xl,
     alignItems: 'center',
-    backgroundColor: COLORS.bgDark,
+    marginBottom: 10,
   },
-  sectionTag: {
-    color: COLORS.accentGold,
-    fontFamily: FONTS.luxury,
-    fontSize: 9,
-    textTransform: 'uppercase',
-    letterSpacing: 5,
-    marginBottom: SPACING.lg,
-    textAlign: 'center',
-  },
-  philosophyText: {
-    color: 'rgba(255,255,255,0.8)',
+  statsValue: {
+    color: COLORS.white,
     fontFamily: FONTS.display,
-    fontSize: 24,
-    fontStyle: 'italic',
-    textAlign: 'center',
-    lineHeight: 36,
-    fontWeight: '300',
-    paddingHorizontal: SPACING.md,
+    fontSize: 16,
   },
-  divider: {
-    width: 30,
-    height: 1,
-    backgroundColor: COLORS.accentGold,
-    marginTop: SPACING.xxl,
-    opacity: 0.4,
+  statsLabel: {
+    color: COLORS.textMuted,
+    fontFamily: FONTS.bodyBold,
+    fontSize: 7,
+    textTransform: 'uppercase',
+    marginTop: 4,
+    letterSpacing: 1,
   },
-  sectionTitleContainer: {
-    paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.xl,
-    paddingBottom: SPACING.lg,
+  sectionHeader: {
+    paddingHorizontal: SPACING.xl,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    backgroundColor: COLORS.bgDark,
+    marginBottom: 30,
   },
   sectionTitle: {
     color: COLORS.white,
     fontFamily: FONTS.display,
-    fontSize: 32,
+    fontSize: 30,
   },
-  italicGold: {
+  accentText: {
     color: COLORS.accentGold,
     fontStyle: 'italic',
-    fontWeight: '300',
   },
-  viewAll: {
-    color: COLORS.accentGold,
+  goldBar: {
+    width: 40,
+    height: 2,
+    backgroundColor: COLORS.accentGold,
+    marginTop: 8,
+  },
+  viewAllText: {
+    color: COLORS.textMuted,
     fontFamily: FONTS.bodyBold,
-    fontSize: 10,
+    fontSize: 9,
     textTransform: 'uppercase',
     letterSpacing: 2,
     paddingBottom: 4,
   },
-  experienceSection: {
-    backgroundColor: 'rgba(255,255,255,0.01)',
-    marginVertical: SPACING.xl,
+  horizontalList: {
+    paddingLeft: SPACING.xl,
+    paddingRight: SPACING.lg,
   },
-  experienceImageContainer: {
-    width: width,
-    height: height * 0.5,
-  },
-  experienceImage: {
-    width: '100%',
-    height: '100%',
-  },
-  experienceOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(5,5,8,0.4)',
-  },
-  experienceContent: {
-    padding: SPACING.xl,
-  },
-  experienceTitle: {
-    color: COLORS.white,
-    fontFamily: FONTS.display,
-    fontSize: 42,
-    lineHeight: 46,
-    marginBottom: SPACING.lg,
-  },
-  whiteItalic: {
-    fontStyle: 'italic',
-    color: 'rgba(255,255,255,0.5)',
-  },
-  experienceDescription: {
-    color: COLORS.textSecondary,
-    fontFamily: FONTS.body,
-    fontSize: 15,
-    lineHeight: 26,
-    marginBottom: SPACING.xl,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: SPACING.xxl,
-    paddingTop: SPACING.xl,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
-  },
-  statItem: {
-    flex: 1,
-  },
-  statValue: {
-    color: COLORS.white,
-    fontFamily: FONTS.display,
-    fontSize: 28,
-    marginBottom: 4,
-  },
-  statLabel: {
-    color: COLORS.textMuted,
-    fontFamily: FONTS.bodyBold,
-    fontSize: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 2,
+  cardItemWrapper: {
+    width: width * 0.65,
+    marginRight: SPACING.lg,
   },
   categoriesSection: {
-    paddingTop: SPACING.xl,
-    backgroundColor: COLORS.bgDark,
-  },
-  catSectionTitle: {
-    color: COLORS.white,
-    fontFamily: FONTS.display,
-    fontSize: 28,
-    textAlign: 'center',
-    marginBottom: SPACING.sm,
-  },
-  newsletterSection: {
-    margin: SPACING.lg,
-    padding: SPACING.xxl,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-  newsletterTitle: {
-    color: COLORS.white,
-    fontFamily: FONTS.display,
-    fontSize: 28,
-    textAlign: 'center',
-    marginBottom: SPACING.md,
-  },
-  newsletterSub: {
-    color: COLORS.textSecondary,
-    fontFamily: FONTS.body,
-    fontSize: 13,
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: SPACING.xl,
-  },
-  inputContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    height: 56,
-  },
-  input: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-    paddingHorizontal: SPACING.lg,
-    color: COLORS.white,
-    fontFamily: FONTS.body,
-    fontSize: 14,
-  },
-  subscribeBtn: {
-    backgroundColor: COLORS.white,
+    marginTop: 60,
     paddingHorizontal: SPACING.xl,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  subscribeBtnText: {
-    color: COLORS.black,
-    fontFamily: FONTS.bodyBold,
-    fontSize: 10,
-    textTransform: 'uppercase',
+  catLabel: {
+    color: COLORS.textMuted,
+    fontFamily: FONTS.luxury,
+    fontSize: 9,
+    letterSpacing: 4,
+    marginBottom: 25,
+    textAlign: 'center',
+  },
+  tilesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 15,
+  },
+  tile: {
+    flex: 1,
+    height: 240,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  tileImg: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    opacity: 0.6,
+  },
+  tileOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+    padding: 20,
+  },
+  tileTitle: {
+    color: COLORS.white,
+    fontFamily: FONTS.display,
+    fontSize: 16,
     letterSpacing: 2,
+    marginBottom: 4,
+  },
+  tileSub: {
+    color: COLORS.accentGold,
+    fontFamily: FONTS.luxury,
+    fontSize: 9,
+    letterSpacing: 1,
+    opacity: 0.8,
   },
 });
 

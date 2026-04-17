@@ -34,5 +34,7 @@ server/uploads/*
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
+
+# Georgian Payments Skills Main
+georgian-payments-skills-main/

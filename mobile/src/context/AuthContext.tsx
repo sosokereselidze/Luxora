@@ -16,6 +16,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
+  googleLogin: (token: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => Promise<void>;
 }
 
@@ -51,13 +52,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       const response = await axios.post(`${API_URL}/auth/login`, { email, password });
-      const { token, user: userData } = response.data;
+      const { token, ...userData } = response.data;
       await AsyncStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      setUser(userData);
+      setUser(userData as any);
       return { success: true };
     } catch (error: any) {
       return { success: false, message: error.response?.data?.message || 'Login failed' };
+    }
+  };
+
+  const googleLogin = async (token: string) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/google`, { token });
+      const { token: luxoraToken, ...userData } = response.data;
+      await AsyncStorage.setItem('token', luxoraToken);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${luxoraToken}`;
+      setUser(userData as any);
+      return { success: true };
+    } catch (error: any) {
+      console.error('Google Auth Error:', error.response?.data);
+      return { success: false, message: error.response?.data?.message || 'Google login failed' };
     }
   };
 
@@ -68,7 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, googleLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );

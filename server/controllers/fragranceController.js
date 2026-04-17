@@ -17,13 +17,20 @@ const validateImage = async (imageUrl) => {
 // @route   GET /api/fragrances/search
 exports.searchFragrances = async (req, res) => {
   try {
-    const { search, limit } = req.query;
+    const { search, limit, page } = req.query;
     if (!search || search.length < 3) {
       return res.status(400).json({ message: 'Search query must be at least 3 characters' });
     }
-    const results = await fragranceService.searchFragrances(search, parseInt(limit) || 10);
+    const results = await fragranceService.searchFragrances(
+      search, 
+      parseInt(limit) || 12, 
+      parseInt(page) || 1
+    );
     res.json(results);
   } catch (error) {
+    if (error.message.includes('429')) {
+      return res.status(429).json({ message: 'API rate limit exceeded. Please wait a moment and try again.' });
+    }
     res.status(500).json({ message: error.message });
   }
 };
@@ -359,7 +366,7 @@ exports.createFragranceReview = async (req, res) => {
     }
 
     const review = {
-      name: req.user.name,
+      name: req.user.username || req.user.name,
       rating: Number(rating),
       comment,
       user: req.user._id,

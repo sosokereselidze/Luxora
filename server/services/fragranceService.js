@@ -43,8 +43,8 @@ class FragellaService {
     });
   }
 
-  async searchFragrances(search, limit = 10) {
-    return this._request('/fragrances', { search, limit: Math.min(limit, 20) });
+  async searchFragrances(search, limit = 12, page = 1) {
+    return this._request('/fragrances', { search, limit: Math.min(limit, 50), page });
   }
 
   async getFragranceById(id) {

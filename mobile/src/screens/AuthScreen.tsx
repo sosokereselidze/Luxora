@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -10,73 +10,89 @@ import {
   ScrollView,
   Dimensions,
   ActivityIndicator,
-  Alert
+  Alert,
+  Image,
+  StatusBar
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Mail, Lock, User as UserIcon, ArrowRight, Sparkles } from 'lucide-react-native';
 import { COLORS, FONTS, SPACING } from '../theme/theme';
+import { Shield, ChevronRight, Mail, Lock, User, Sparkles } from 'lucide-react-native';
 import { useAuth } from '../context/AuthContext';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import * as AuthSession from 'expo-auth-session';
+
+WebBrowser.maybeCompleteAuthSession();
 
 const { width, height } = Dimensions.get('window');
 
-type RootStackParamList = {
-  MainTabs: undefined;
-  Auth: { isRegister?: boolean } | undefined;
-};
-
-type Props = NativeStackScreenProps<RootStackParamList, 'Auth'>;
-
-const AuthScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { login } = useAuth();
-  const [isRegister, setIsRegister] = useState(route.params?.isRegister || false);
+const AuthScreen = () => {
+  const { login, googleLogin } = useAuth();
+  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    name: '',
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+
+  // Google Auth Setup
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: '779575147339-8d5ek3fhpe5p28deamgis3g2h94skbdo.apps.googleusercontent.com',
+    webClientId: '779575147339-8d5ek3fhpe5p28deamgis3g2h94skbdo.apps.googleusercontent.com',
+    redirectUri: AuthSession.makeRedirectUri({
+      scheme: 'luxora-clone',
+    }),
   });
 
-  const handleAuth = async () => {
-    if (!formData.email || !formData.password) {
-      Alert.alert('Incomplete Credentials', 'Please provide both your identity and access key.');
+  useEffect(() => {
+    // Reveal the Redirect URI for whitelisting in Google Console
+    const redirectUri = AuthSession.makeRedirectUri({
+      scheme: 'luxora-clone',
+    });
+    console.log('🔗 LUXORA REDIRECT URI:', redirectUri);
+
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      handleGoogleLogin(id_token);
+    }
+  }, [response]);
+
+  const handleGoogleLogin = async (idToken: string) => {
+    setLoading(true);
+    const result = await googleLogin(idToken);
+    if (!result.success) {
+      Alert.alert('Access Denied', result.message);
+    }
+    setLoading(false);
+  };
+
+  const handleAction = async () => {
+    if (!email || !password) {
+      Alert.alert('Information Missing', 'Please fill all fields to proceed.');
       return;
     }
-
     setLoading(true);
-    try {
-      if (isRegister) {
-        // Registration logic if we had the service method exposed
-        // For now we'll focus on login as per the basic mobile requirement
-        Alert.alert('Boutique Access', 'Registration is currently handled via Invitation or Web Portal. Please use existing credentials.');
-      } else {
-        const result = await login(formData.email, formData.password);
-        if (result.success) {
-          navigation.navigate('MainTabs');
-        } else {
-          Alert.alert('Access Denied', result.message || 'The credentials provided do not match our records.');
-        }
-      }
-    } catch (err) {
-      Alert.alert('Network Error', 'The Society server is currently unreachable.');
-    } finally {
-      setLoading(false);
+    const result = await login(email, password);
+    if (!result.success) {
+      Alert.alert('Access Denied', result.message);
     }
+    setLoading(false);
   };
 
   return (
     <View style={styles.container}>
-      <LinearGradient 
-        colors={[COLORS.bgDark, '#0a0a15', COLORS.bgDark]} 
-        style={StyleSheet.absoluteFillObject}
-      />
+      <StatusBar barStyle="light-content" />
       
-      {/* Decorative Orbs */}
-      <View style={[styles.orb, { top: -100, right: -100, backgroundColor: 'rgba(56, 38, 115, 0.15)' }]} />
-      <View style={[styles.orb, { bottom: -150, left: -150, backgroundColor: 'rgba(201, 169, 110, 0.05)' }]} />
+      {/* Dynamic Background */}
+      <View style={StyleSheet.absoluteFillObject}>
+        <View style={styles.bgSurface} />
+        <LinearGradient 
+          colors={['transparent', 'rgba(94,68,255,0.15)', 'transparent']} 
+          style={styles.ambientGlow} 
+        />
+        <View style={styles.decorativeOrb1} />
+        <View style={styles.decorativeOrb2} />
+      </View>
 
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -84,111 +100,104 @@ const AuthScreen: React.FC<Props> = ({ navigation, route }) => {
       >
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
-            <View style={styles.iconContainer}>
-              <Sparkles size={32} color={COLORS.accentGold} />
+            <View style={styles.logoContainer}>
+              <Shield color={COLORS.accentGold} size={40} strokeWidth={1.5} />
             </View>
-            <Text style={styles.title}>{isRegister ? 'Join The Society' : 'Welcome Back'}</Text>
-            <Text style={styles.subtitle}>{isRegister ? 'Begin Your Olfactory Journey' : 'Access Your Private Collection'}</Text>
+            <Text style={styles.brandTitle}>LUXORA</Text>
+            <Text style={styles.subtitle}>PRIVATE PORTAL</Text>
           </View>
 
-          <View style={styles.card}>
-            <View style={styles.cardOverlay} />
+          <View style={styles.formContainer}>
+            <Text style={styles.welcomeText}>
+              {isLogin ? 'Enter the Society' : 'Apply for Access'}
+            </Text>
             
-            <View style={styles.form}>
-              {isRegister && (
-                <>
-                  <View style={styles.inputWrapper}>
-                    <UserIcon size={18} color="rgba(255,255,255,0.3)" style={styles.inputIcon} />
-                    <TextInput 
-                      placeholder="Full Name"
-                      placeholderTextColor="rgba(255,255,255,0.2)"
-                      style={styles.input}
-                      value={formData.name}
-                      onChangeText={(text) => setFormData({...formData, name: text})}
-                    />
-                  </View>
-                  <View style={styles.inputWrapper}>
-                    <UserIcon size={18} color="rgba(255,255,255,0.3)" style={styles.inputIcon} />
-                    <TextInput 
-                      placeholder="Unique Username"
-                      placeholderTextColor="rgba(255,255,255,0.2)"
-                      style={styles.input}
-                      value={formData.username}
-                      onChangeText={(text) => setFormData({...formData, username: text})}
-                    />
-                  </View>
-                </>
-              )}
+            {/* Google Social Login */}
+            <TouchableOpacity 
+              style={styles.googleBtn} 
+              disabled={!request || loading}
+              onPress={() => promptAsync()}
+              activeOpacity={0.8}
+            >
+              <View style={styles.googleIconCircle}>
+                <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Log_o.svg' }} style={{ width: 18, height: 18 }} />
+              </View>
+              <Text style={styles.googleBtnText}>Enter with Google Access</Text>
+            </TouchableOpacity>
 
+            <View style={styles.dividerRow}>
+              <View style={styles.divider} />
+              <Text style={styles.dividerText}>OR SECURE PORTAL</Text>
+              <View style={styles.divider} />
+            </View>
+
+            {!isLogin && (
               <View style={styles.inputWrapper}>
-                <Mail size={18} color="rgba(255,255,255,0.3)" style={styles.inputIcon} />
+                <User size={18} color={COLORS.accentGold} style={styles.inputIcon} />
                 <TextInput 
-                  placeholder="Email Address"
-                  placeholderTextColor="rgba(255,255,255,0.2)"
                   style={styles.input}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  value={formData.email}
-                  onChangeText={(text) => setFormData({...formData, email: text})}
+                  placeholder="Full Name"
+                  placeholderTextColor={COLORS.textMuted}
+                  value={name}
+                  onChangeText={setName}
+                  autoCapitalize="words"
                 />
               </View>
+            )}
 
-              <View style={styles.inputWrapper}>
-                <Lock size={18} color="rgba(255,255,255,0.3)" style={styles.inputIcon} />
-                <TextInput 
-                  placeholder="Password"
-                  placeholderTextColor="rgba(255,255,255,0.2)"
-                  style={styles.input}
-                  secureTextEntry
-                  value={formData.password}
-                  onChangeText={(text) => setFormData({...formData, password: text})}
-                />
-              </View>
+            <View style={styles.inputWrapper}>
+              <Mail size={18} color={COLORS.accentGold} style={styles.inputIcon} />
+              <TextInput 
+                style={styles.input}
+                placeholder="Identity (Email or Username)"
+                placeholderTextColor={COLORS.textMuted}
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+              />
+            </View>
 
-              {isRegister && (
-                <View style={styles.inputWrapper}>
-                  <Lock size={18} color="rgba(255,255,255,0.3)" style={styles.inputIcon} />
-                  <TextInput 
-                    placeholder="Confirm Password"
-                    placeholderTextColor="rgba(255,255,255,0.2)"
-                    style={styles.input}
-                    secureTextEntry
-                    value={formData.confirmPassword}
-                    onChangeText={(text) => setFormData({...formData, confirmPassword: text})}
-                  />
-                </View>
-              )}
+            <View style={styles.inputWrapper}>
+              <Lock size={18} color={COLORS.accentGold} style={styles.inputIcon} />
+              <TextInput 
+                style={styles.input}
+                placeholder="Access Code"
+                placeholderTextColor={COLORS.textMuted}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+            </View>
 
-              {!isRegister && (
-                <TouchableOpacity style={styles.forgotBtn}>
-                  <Text style={styles.forgotText}>Lost your key?</Text>
-                </TouchableOpacity>
-              )}
-
-              <TouchableOpacity 
-                style={styles.authBtn} 
-                onPress={handleAuth}
-                disabled={loading}
+            <TouchableOpacity 
+              style={styles.mainBtn} 
+              onPress={handleAction}
+              disabled={loading}
+            >
+              <LinearGradient
+                colors={[COLORS.accentGold, '#B8860B']}
+                style={styles.btnGradient}
               >
                 {loading ? (
                   <ActivityIndicator color={COLORS.black} />
                 ) : (
                   <>
-                    <Text style={styles.authBtnText}>{isRegister ? 'Apply For Access' : 'Enter The Portal'}</Text>
-                    <ArrowRight size={18} color={COLORS.black} />
+                    <Text style={styles.btnText}>{isLogin ? 'AUTHENTICATE' : 'APPLY'}</Text>
+                    <ChevronRight size={18} color={COLORS.black} />
                   </>
                 )}
-              </TouchableOpacity>
-            </View>
-          </View>
+              </LinearGradient>
+            </TouchableOpacity>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              {isRegister ? 'Already a patron?' : 'New to Luxora?'}
-            </Text>
-            <TouchableOpacity onPress={() => setIsRegister(!isRegister)}>
-              <Text style={styles.footerLink}>
-                {isRegister ? ' Sign In Here' : ' Create an Account'}
+            <TouchableOpacity 
+              onPress={() => setIsLogin(!isLogin)}
+              style={styles.switchBtn}
+            >
+              <Text style={styles.switchText}>
+                {isLogin ? "Don't have access? " : "Already a member? "}
+                <Text style={styles.switchHighlight}>
+                  {isLogin ? "Apply Now" : "Authenticate"}
+                </Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -203,71 +212,143 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgDark,
   },
-  orb: {
+  bgSurface: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: COLORS.bgDark,
+  },
+  ambientGlow: {
     position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
+    top: height * 0.2,
+    left: -width * 0.5,
+    right: -width * 0.5,
+    height: height * 0.6,
+    opacity: 0.5,
+  },
+  decorativeOrb1: {
+    position: 'absolute',
+    top: -50,
+    right: -50,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(94,68,255,0.05)',
+  },
+  decorativeOrb2: {
+    position: 'absolute',
+    bottom: 100,
+    left: -80,
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: 'rgba(201, 169, 110, 0.03)',
   },
   scrollContent: {
-    padding: SPACING.xl,
+    flexGrow: 1,
+    paddingHorizontal: SPACING.xl,
     paddingTop: height * 0.1,
-    paddingBottom: 40,
+    paddingBottom: SPACING.xxl,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 50,
+    marginBottom: SPACING.xxl,
   },
-  iconContainer: {
-    width: 70,
-    height: 70,
-    backgroundColor: 'rgba(255,255,255,0.02)',
+  logoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(201, 169, 110, 0.05)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: 'rgba(201, 169, 110, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: SPACING.xl,
+    marginBottom: SPACING.lg,
   },
-  title: {
+  brandTitle: {
     color: COLORS.white,
     fontFamily: FONTS.display,
-    fontSize: 32,
-    marginBottom: 8,
-    textAlign: 'center',
+    fontSize: 28,
+    letterSpacing: 8,
   },
   subtitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.accentGold,
     fontFamily: FONTS.luxury,
-    fontSize: 9,
-    textTransform: 'uppercase',
-    letterSpacing: 2,
-    textAlign: 'center',
-    opacity: 0.6,
+    fontSize: 10,
+    letterSpacing: 4,
+    marginTop: 8,
   },
-  card: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+  formContainer: {
+    backgroundColor: 'rgba(20,20,31,0.6)',
+    borderRadius: 30,
     padding: SPACING.xl,
-    position: 'relative',
-    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
   },
-  cardOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255,255,255,0.01)',
+  welcomeText: {
+    color: COLORS.white,
+    fontFamily: FONTS.display,
+    fontSize: 22,
+    marginBottom: 30,
+    textAlign: 'center',
   },
-  form: {
-    gap: 24,
+  googleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    height: 56,
+    borderRadius: 15,
+    paddingHorizontal: 20,
+    marginBottom: 25,
+    justifyContent: 'center',
+    gap: 15,
+  },
+  googleIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  googleBtnText: {
+    color: COLORS.white,
+    fontFamily: FONTS.bodyBold,
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 25,
+    gap: 15,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  dividerText: {
+    color: COLORS.textMuted,
+    fontFamily: FONTS.bodyBold,
+    fontSize: 8,
+    letterSpacing: 2,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
-    paddingVertical: 10,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 15,
+    marginBottom: 15,
+    paddingHorizontal: 15,
+    height: 56,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
   },
   inputIcon: {
     marginRight: 15,
+    opacity: 0.8,
   },
   input: {
     flex: 1,
@@ -275,47 +356,37 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.body,
     fontSize: 14,
   },
-  forgotBtn: {
-    alignSelf: 'flex-end',
-    marginTop: -8,
+  mainBtn: {
+    height: 56,
+    borderRadius: 15,
+    overflow: 'hidden',
+    marginTop: 15,
   },
-  forgotText: {
-    color: 'rgba(255,255,255,0.3)',
-    fontFamily: FONTS.body,
-    fontSize: 11,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  authBtn: {
-    height: 60,
-    backgroundColor: COLORS.white,
+  btnGradient: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
-    marginTop: 20,
+    gap: 10,
   },
-  authBtnText: {
+  btnText: {
     color: COLORS.black,
     fontFamily: FONTS.bodyBold,
     fontSize: 12,
-    textTransform: 'uppercase',
     letterSpacing: 2,
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 40,
+  switchBtn: {
+    marginTop: 25,
+    alignItems: 'center',
   },
-  footerText: {
-    color: 'rgba(255,255,255,0.4)',
+  switchText: {
+    color: COLORS.textSecondary,
     fontFamily: FONTS.body,
-    fontSize: 12,
+    fontSize: 13,
   },
-  footerLink: {
+  switchHighlight: {
     color: COLORS.accentGold,
     fontFamily: FONTS.bodyBold,
-    fontSize: 12,
   },
 });
 

@@ -12,7 +12,7 @@ import {
 } from '../api/fragrances';
 import {
   HiSearch, HiX, HiAdjustments, HiChevronLeft, HiChevronRight,
-  HiEye, HiEyeOff, HiTrash, HiSparkles, HiFilter, HiSortDescending,
+  HiEye, HiEyeOff, HiTrash, HiSparkles, HiFilter, HiSortAscending, HiSortDescending,
   HiCurrencyDollar, HiBeaker, HiHashtag
 } from 'react-icons/hi';
 import { toast } from 'react-hot-toast';
@@ -36,6 +36,7 @@ const Shop = () => {
   const [accord, setAccord] = useState('');
   const [note, setNote] = useState('');
   const [volume, setVolume] = useState('');
+  const [sort, setSort] = useState('newest');
 
   // Data for Filters
   const [brands, setBrands] = useState([]);
@@ -57,6 +58,7 @@ const Shop = () => {
         accord,
         note,
         volume,
+        sort,
         admin: isAdmin ? 'true' : 'false'
       };
 
@@ -69,7 +71,7 @@ const Shop = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, keyword, brand, category, minPrice, maxPrice, accord, note, volume, isAdmin]);
+  }, [page, keyword, brand, category, minPrice, maxPrice, accord, note, volume, sort, isAdmin]);
 
   const fetchFilterData = async () => {
     try {
@@ -103,6 +105,7 @@ const Shop = () => {
     setNote('');
     setVolume('');
     setKeyword('');
+    setSort('newest');
     setPage(1);
   };
 
@@ -177,12 +180,25 @@ const Shop = () => {
               {keyword && <HiX className="text-white/30 cursor-pointer hover:text-white" onClick={() => { setKeyword(''); setPage(1); }} />}
             </div>
 
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-3 px-10 py-4 font-bold text-[0.6rem] uppercase tracking-[0.4em] transition-all border ${showFilters ? 'bg-primary text-white border-primary' : 'bg-transparent text-white border-white/10 hover:border-white'}`}
-            >
-              <HiAdjustments className="text-sm" /> Advanced Filters
-            </button>
+            <div className="flex items-center gap-3">
+              <select
+                value={sort}
+                onChange={(e) => { setSort(e.target.value); setPage(1); }}
+                className="bg-white/[0.02] border border-white/10 text-white px-6 py-4 text-[0.6rem] font-bold uppercase tracking-[0.4em] outline-none hover:border-white/30 transition-all cursor-pointer"
+              >
+                <option value="newest" className="bg-bg-dark">Sort: Newest</option>
+                <option value="price_asc" className="bg-bg-dark">Price: Low to High</option>
+                <option value="price_desc" className="bg-bg-dark">Price: High to Low</option>
+                <option value="bestsellers" className="bg-bg-dark">Bestsellers</option>
+              </select>
+
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`flex items-center gap-3 px-10 py-4 font-bold text-[0.6rem] uppercase tracking-[0.4em] transition-all border ${showFilters ? 'bg-primary text-white border-primary' : 'bg-transparent text-white border-white/10 hover:border-white'}`}
+              >
+                <HiAdjustments className="text-sm" /> Advanced Filters
+              </button>
+            </div>
           </div>
         </div>
 

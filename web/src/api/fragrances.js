@@ -1,7 +1,9 @@
 import apiClient from './client';
 
-export const searchFragrances = (search, limit = 10) =>
-  apiClient.get(`/fragrances/search?search=${encodeURIComponent(search)}&limit=${limit}`);
+export const searchFragrances = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return apiClient.get(`/fragrances/search${query ? `?${query}` : ''}`);
+};
 
 export const getSimilarFragrances = (name, limit = 10) =>
   apiClient.get(`/fragrances/similar?name=${encodeURIComponent(name)}&limit=${limit}`);
@@ -33,19 +35,22 @@ export const getStoredFragrances = (params = {}) => {
 
 export const getStoredFragrance = (id) => apiClient.get(`/fragrances/store/${id}`);
 
-export const importFragrances = (fragrances) => 
+export const importFragrances = (fragrances) =>
   apiClient.post('/fragrances/import', { fragrances });
 
-export const toggleVisibility = (id) => 
+export const updateStoredFragrance = (id, data) =>
+  apiClient.put(`/fragrances/store/${id}`, data);
+
+export const toggleVisibility = (id) =>
   apiClient.patch(`/fragrances/store/${id}/visibility`);
 
-export const toggleFeatured = (id) => 
+export const toggleFeatured = (id) =>
   apiClient.patch(`/fragrances/store/${id}/featured`);
 
-export const deleteStoredFragrance = (id) => 
+export const deleteStoredFragrance = (id) =>
   apiClient.delete(`/fragrances/store/${id}`);
 
-export const getStoredBrands = () => 
+export const getStoredBrands = () =>
   apiClient.get('/fragrances/store/brands');
 
 export const getStoredAccords = () =>

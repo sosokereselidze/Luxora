@@ -119,8 +119,26 @@ exports.deleteUser = async (req, res) => {
     if (user._id.toString() === req.user._id.toString()) {
       return res.status(400).json({ message: 'Cannot delete your own admin account' });
     }
+    // Cascade delete reviews for this user on Fragrances
+    const fragrancesWithReview = await Fragrance.find({ 'reviews.user': req.params.id });
+    for (const f of fragrancesWithReview) {
+      f.reviews = f.reviews.filter(r => r.user.toString() !== req.params.id);
+      f.numReviews = f.reviews.length;
+      f.rating = f.reviews.length ? f.reviews.reduce((acc, r) => acc + r.rating, 0) / f.reviews.length : 5;
+      await f.save();
+    }
+
+    // Cascade delete reviews for this user on old Products
+    const productsWithReview = await Product.find({ 'reviews.user': req.params.id });
+    for (const p of productsWithReview) {
+      p.reviews = p.reviews.filter(r => r.user.toString() !== req.params.id);
+      p.numReviews = p.reviews.length;
+      p.rating = p.reviews.length ? p.reviews.reduce((acc, r) => acc + r.rating, 0) / p.reviews.length : 5;
+      await p.save();
+    }
+
     await User.findByIdAndDelete(req.params.id);
-    res.json({ message: 'User removed' });
+    res.json({ message: 'User and their reviews removed' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

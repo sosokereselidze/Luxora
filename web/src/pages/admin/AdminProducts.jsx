@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getProducts, createProduct, updateProduct, deleteProduct } from '../../api/products';
+import { getStoredFragrances, importFragrances, updateStoredFragrance, deleteStoredFragrance } from '../../api/fragrances';
 import toast from 'react-hot-toast';
 
 const EMPTY = { name:'', brand:'', description:'', price:0, image:'', category:'Unisex', volume:'100ml', stock:50, featured:false };
@@ -12,21 +12,27 @@ const AdminProducts = () => {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
-  const load = async () => {
+  const load = async (pageNum = page, searchQuery = search) => {
     setLoading(true);
-    const r = await getProducts();
-    setProducts(r.data);
+    const r = await getStoredFragrances({ admin: true, limit: 12, page: pageNum, keyword: searchQuery });
+    setProducts(r.data.fragrances || []);
+    setTotalPages(r.data.pages || 1);
+    setTotalItems(r.data.total || 0);
     setLoading(false);
   };
-  useEffect(() => { load(); }, []);
+
+  useEffect(() => { load(page, search); }, [page, search]);
 
   const openAdd = () => { setEditing(null); setForm(EMPTY); setShowModal(true); };
   const openEdit = (p) => { setEditing(p); setForm({...p}); setShowModal(true); };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this product?')) return;
-    try { await deleteProduct(id); toast.success('Product deleted'); load(); }
+    try { await deleteStoredFragrance(id); toast.success('Product deleted'); load(); }
     catch { toast.error('Delete failed'); }
   };
 
@@ -34,18 +40,16 @@ const AdminProducts = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      if (editing) { await updateProduct(editing._id, form); toast.success('Product updated'); }
-      else { await createProduct(form); toast.success('Product created'); }
+      if (editing) { await updateStoredFragrance(editing._id, form); toast.success('Product updated'); }
+      else { await importFragrances([{...form, Name: form.name, Brand: form.brand, Price: form.price, Gender: form.category, Volume: form.volume}]); toast.success('Product created'); }
       setShowModal(false);
       load();
     } catch { toast.error('Save failed'); }
     finally { setSaving(false); }
   };
 
-  const filtered = products.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.brand.toLowerCase().includes(search.toLowerCase())
-  );
+  // We no longer need local filtering if doing server filtering
+  const filtered = products;
 
   const S = {
     th: { padding:'14px 16px', fontSize:'10px', fontWeight:'700', letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(255,255,255,0.35)', borderBottom:'1px solid rgba(255,255,255,0.05)', textAlign:'left', whiteSpace:'nowrap' },
@@ -60,11 +64,11 @@ const AdminProducts = () => {
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'12px' }}>
         <div>
           <h2 style={{ fontFamily:'"Playfair Display",serif', fontSize:'26px', fontWeight:'400', color:'#f8f4ff', margin:'0 0 4px 0' }}>Products</h2>
-          <p style={{ color:'rgba(255,255,255,0.3)', fontSize:'12px', margin:0 }}>{products.length} items in catalogue</p>
+          <p style={{ color:'rgba(255,255,255,0.3)', fontSize:'12px', margin:0 }}>{totalItems} items in catalogue</p>
         </div>
         <div style={{ display:'flex', gap:'12px', alignItems:'center', flexWrap:'wrap' }}>
           <div style={{ position:'relative' }}>
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..."
+            <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Search products..."
               style={{ ...S.input, width:'220px', paddingLeft:'36px' }} />
             <svg style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', color:'rgba(255,255,255,0.3)' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </div>
@@ -127,6 +131,26 @@ const AdminProducts = () => {
           </table>
         )}
       </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', paddingTop: '8px' }}>
+          <button 
+            disabled={page === 1} 
+            onClick={() => setPage(page - 1)}
+            style={{ padding:'8px 16px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color: page===1 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.7)', cursor: page===1 ? 'not-allowed' : 'pointer', fontSize:'11px', fontWeight:'700', letterSpacing:'0.1em', textTransform:'uppercase' }}
+          >
+            ← Prev
+          </button>
+          <div style={{ padding:'8px 16px', background:'rgba(201,169,110,0.1)', border:'1px solid rgba(201,169,110,0.2)', color:'#c9a96e', fontSize:'11px', fontWeight:'700', letterSpacing:'0.1em', textTransform:'uppercase' }}>
+            Page {page} of {totalPages}
+          </div>
+          <button 
+            disabled={page === totalPages} 
+            onClick={() => setPage(page + 1)}
+            style={{ padding:'8px 16px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color: page===totalPages ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.7)', cursor: page===totalPages ? 'not-allowed' : 'pointer', fontSize:'11px', fontWeight:'700', letterSpacing:'0.1em', textTransform:'uppercase' }}
+          >
+            Next →
+          </button>
+        </div>
 
       {/* Modal */}
       {showModal && (

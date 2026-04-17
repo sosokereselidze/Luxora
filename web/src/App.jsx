@@ -17,7 +17,7 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Auth from './pages/Auth';
 import Admin from './pages/Admin';
-import FragranceExplorer from './pages/FragranceExplorer';
+import PaymentResult from './pages/PaymentResult';
 
 // Protected Route — any logged-in user
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -63,7 +63,6 @@ const AppInner = () => {
           {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
-          <Route path="/explore" element={<FragranceExplorer />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Auth />} />
@@ -71,6 +70,9 @@ const AppInner = () => {
 
           {/* Protected user routes */}
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+          <Route path="/payment/success" element={<ProtectedRoute><PaymentResult type="success" /></ProtectedRoute>} />
+          <Route path="/payment/fail" element={<ProtectedRoute><PaymentResult type="fail" /></ProtectedRoute>} />
+          <Route path="/payment/cancel" element={<ProtectedRoute><PaymentResult type="fail" /></ProtectedRoute>} />
 
           {/* Admin routes — no Navbar/Footer */}
           <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />

@@ -18,6 +18,7 @@ interface CartItem extends Product {
 interface CartContextType {
   cart: CartItem[];
   addToCart: (product: Product, volume: string, price: number) => void;
+  updateQuantity: (productId: string, volume: string, quantity: number) => void;
   removeFromCart: (productId: string, volume: string) => void;
   clearCart: () => Promise<void>;
   cartTotal: number;
@@ -67,6 +68,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     saveCart(newCart);
   };
 
+  const updateQuantity = (productId: string, volume: string, quantity: number) => {
+    const newCart = cart.map(item => 
+      item._id === productId && item.volume === volume 
+        ? { ...item, quantity: Math.max(1, quantity) }
+        : item
+    );
+    setCart(newCart);
+    saveCart(newCart);
+  };
+
   const removeFromCart = (productId: string, volume: string) => {
     const newCart = cart.filter(item => !(item._id === productId && item.volume === volume));
     setCart(newCart);
@@ -81,7 +92,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, cartTotal }}>
+    <CartContext.Provider value={{ cart, addToCart, updateQuantity, removeFromCart, clearCart, cartTotal }}>
       {children}
     </CartContext.Provider>
   );

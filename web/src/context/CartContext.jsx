@@ -1,21 +1,38 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
+  const { user } = useAuth();
   const [cartItems, setCartItems] = useState(() => {
     const stored = localStorage.getItem('luxora_cart');
     return stored ? JSON.parse(stored) : [];
   });
 
+  // Clear the cart entirely if the user logs out
   useEffect(() => {
-    localStorage.setItem('luxora_cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    if (!user) {
+      setCartItems([]);
+      localStorage.removeItem('luxora_cart');
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user && cartItems.length > 0) {
+      localStorage.setItem('luxora_cart', JSON.stringify(cartItems));
+    }
+  }, [cartItems, user]);
 
   const addToCart = (product, quantity = 1) => {
+    if (!user) {
+      toast.error('Please create an account or sign in to add to your bag');
+      return;
+    }
+
     setCartItems(prev => {
       const exists = prev.find(item => item._id === product._id);
       if (exists) {
@@ -47,6 +64,7 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     setCartItems([]);
+    localStorage.removeItem('luxora_cart');
   };
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
