@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * 2. For Physical Device: Use 'http://YOUR_COMPUTER_IP:5000/api'
  *    (Find your IP by running 'ipconfig' in cmd)
  */
-const BASE_URL = 'http://192.168.0.104:5000'; // Updated to your computer's IP
+const BASE_URL = 'http://192.168.0.12:5000'; // Updated to your computer's new IP
 export const API_URL = `${BASE_URL}/api`;
 
 const apiClient = axios.create({
