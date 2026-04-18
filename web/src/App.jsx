@@ -18,6 +18,9 @@ import Checkout from './pages/Checkout';
 import Auth from './pages/Auth';
 import Admin from './pages/Admin';
 import PaymentResult from './pages/PaymentResult';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import Cookies from './pages/Cookies';
 
 // Protected Route — any logged-in user
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -67,6 +70,9 @@ const AppInner = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/register" element={<Auth isRegister />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/cookies" element={<Cookies />} />
 
           {/* Protected user routes */}
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />

@@ -103,11 +103,11 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row items-center justify-between border-t border-white/5 pt-10 text-white/20 text-[0.55rem] font-bold uppercase tracking-[0.2em] gap-6">
           <p>© {new Date().getFullYear()} Luxora. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-white/60 transition-colors">Privacy Policy</a>
+            <Link to="/privacy-policy" className="hover:text-white/60 transition-colors">Privacy Policy</Link>
             <span className="opacity-30">•</span>
-            <a href="#" className="hover:text-white/60 transition-colors">Terms of Service</a>
+            <Link to="/terms-of-service" className="hover:text-white/60 transition-colors">Terms of Service</Link>
             <span className="opacity-30">•</span>
-            <a href="#" className="hover:text-white/60 transition-colors">Cookies</a>
+            <Link to="/cookies" className="hover:text-white/60 transition-colors">Cookies</Link>
           </div>
         </div>
       </div>

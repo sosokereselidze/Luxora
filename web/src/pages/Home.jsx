@@ -195,30 +195,7 @@ const Home = () => {
           </div>
         </section>
         
-        {/* Newsletter Section */}
-        <section className="section-padding relative overflow-hidden border-t border-white/5">
-          <div className="absolute inset-0 bg-primary/5 blur-[150px] rounded-full translate-x-1/2 opacity-20"></div>
-          
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="max-w-3xl mx-auto text-center">
-              <span className="text-accent-gold text-[0.6rem] font-bold uppercase tracking-[0.6em] mb-6 block">The Inner Circle</span>
-              <h2 className="font-display text-4xl md:text-5xl text-white mb-8">Join the Luxora Society</h2>
-              <p className="text-text-secondary text-base md:text-lg mb-12 font-light leading-relaxed">Subscribe to receive exclusive access to limited editions, private events, and insider news from the world of high perfumery.</p>
-              
-              <form className="flex flex-col sm:flex-row gap-0 max-w-xl mx-auto group shadow-2xl" onSubmit={(e) => { e.preventDefault(); alert('Subscribed to society!'); }}>
-                <input 
-                  type="email" 
-                  placeholder="Enter your email address" 
-                  className="input-field border-white/10 bg-white/[0.02] flex-1 !py-5"
-                  required
-                />
-                <button type="submit" className="btn btn-primary !px-12 !py-5">
-                  Join
-                </button>
-              </form>
-            </div>
-          </div>
-        </section>
+
         
       </div>
     </div>
