@@ -442,7 +442,7 @@ const ProductDetails = () => {
                       <HiShieldCheck className="text-2xl text-accent-gold/40" />
                     </div>
                     <p className="text-text-secondary text-sm mb-10 font-light leading-relaxed max-w-[300px]">Authentication is required to ensure the authenticity of our fragrance community.</p>
-                    <Link to="/auth" className="btn btn-secondary text-[0.55rem] px-12 h-12 uppercase tracking-[0.3em] border border-white/10 hover:border-accent-gold/30">
+                    <Link to="/login" className="btn btn-secondary text-[0.55rem] px-12 h-12 uppercase tracking-[0.3em] border border-white/10 hover:border-accent-gold/30">
                       Sign In / Register
                     </Link>
                   </div>
