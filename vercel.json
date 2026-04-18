@@ -6,22 +6,25 @@
       "use": "@vercel/node"
     },
     {
-      "src": "web/dist/**/*",
-      "use": "@vercel/static"
+      "src": "web/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/server/server.js"
+      "destination": "server/server.js"
     },
     {
       "source": "/uploads/(.*)",
-      "destination": "/server/uploads/$1"
+      "destination": "server/server.js"
     },
     {
       "source": "/(.*)",
-      "destination": "/web/dist/index.html"
+      "destination": "web/$1"
     }
   ]
 }
