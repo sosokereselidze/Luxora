@@ -94,19 +94,6 @@ const ProductDetails = () => {
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
-    toast.success(`${product.name} added to cart!`, {
-      style: {
-        background: '#0a0a0f',
-        color: '#ffffff',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '0',
-        padding: '12px 18px',
-        fontWeight: '400',
-        fontSize: '11px',
-        letterSpacing: '0.1em',
-        fontFamily: 'Montserrat, sans-serif'
-      },
-    });
   };
 
   const submitHandler = async (e) => {

@@ -29,8 +29,8 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product, quantity = 1) => {
     if (!user) {
-      toast.error('Please create an account or sign in to add to your bag');
-      return;
+      toast.error('Please create an account or sign in to add items to your bag');
+      return false;
     }
 
     setCartItems(prev => {
@@ -46,6 +46,7 @@ export const CartProvider = ({ children }) => {
       toast.success(`${product.name} added to cart`);
       return [...prev, { ...product, quantity }];
     });
+    return true;
   };
 
   const removeFromCart = (productId) => {

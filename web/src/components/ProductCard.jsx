@@ -15,19 +15,6 @@ const ProductCard = ({ product }) => {
 
     setTimeout(() => {
       addToCart(product);
-      toast.success(`${product.name} added to cart!`, {
-        style: {
-          background: '#0a0a0f',
-          color: '#ffffff',
-          border: '1px solid rgba(201, 169, 110, 0.3)',
-          borderRadius: '0',
-          padding: '16px 24px',
-          fontWeight: '400',
-          fontSize: '12px',
-          letterSpacing: '0.1em',
-          fontFamily: 'Montserrat, sans-serif'
-        },
-      });
       setIsAdding(false);
     }, 300);
   };
