@@ -8,8 +8,10 @@ import {
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
-  SafeAreaView
+  SafeAreaView,
+  TextInput
 } from 'react-native';
+
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ChevronLeft,
@@ -24,10 +26,14 @@ import {
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, FONTS, SPACING } from '../theme/theme';
-import { getStoredFragrance } from '../services/fragranceService';
 import { getImageUrl } from '../services/api';
+import { getProduct, createReview } from '../services/productService';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { toast } from 'react-hot-toast'; // I'll assume toast is available or I'll handle errors gracefully
+import { Alert } from 'react-native';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -42,11 +48,18 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { id } = route.params;
   const insets = useSafeAreaInsets();
   const { addToCart } = useCart();
+  const { user } = useAuth();
 
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+
+  // Review states
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+
 
   useEffect(() => {
     fetchProduct();
@@ -54,13 +67,15 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const fetchProduct = async () => {
     try {
-      const { data } = await getStoredFragrance(id);
+      // Use unified getProduct from productService which handles both MongoIDs and external IDs
+      const { data } = await getProduct(id);
       setProduct({
         ...data,
         topNotes: data.topNotes || [],
-        middleNotes: data.middleNotes || data.middleNotes || [],
+        middleNotes: data.middleNotes || [],
         baseNotes: data.baseNotes || [],
         accords: data.accords || [],
+        reviews: data.reviews || []
       });
     } catch (error) {
       console.error('Error fetching product details:', error);
@@ -68,6 +83,44 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       setLoading(false);
     }
   };
+
+  const handleReviewSubmit = async () => {
+    if (!user) {
+      Alert.alert('Authentication Required', 'Please sign in to share your impression.', [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Sign In', onPress: () => navigation.navigate('Profile' as any) }
+      ]);
+      return;
+    }
+
+    if (!comment.trim()) {
+      Alert.alert('Incomplete', 'Please provide a commentary for your testimonial.');
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      const response = await createReview(id, {
+        rating,
+        comment,
+        productInfo: product // Pass product info for auto-creation if needed
+      });
+
+      Alert.alert('Success', 'Your testimonial has been posted.');
+      setComment('');
+      setRating(5);
+      
+      // Refresh product data
+      const targetId = response.data.productId || id;
+      const { data } = await getProduct(targetId);
+      setProduct(data);
+    } catch (error: any) {
+      Alert.alert('Error', error.response?.data?.message || 'Failed to post review');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -209,7 +262,76 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               <Text style={styles.featureSub}>8h+ Projection</Text>
             </View>
           </View>
+
+          {/* Reviews Section */}
+          <View style={styles.reviewsSection}>
+            <Text style={styles.sectionTitle}>Audience <Text style={styles.italicGold}>Feedback</Text></Text>
+            
+            <View style={styles.reviewList}>
+              {product.reviews && product.reviews.length > 0 ? (
+                product.reviews.map((rev: any, i: number) => (
+                  <View key={rev._id || i} style={styles.reviewCard}>
+                    <View style={styles.reviewHeader}>
+                      <View>
+                        <Text style={styles.reviewerName}>{rev.name}</Text>
+                        <Text style={styles.reviewDate}>{new Date(rev.createdAt).toLocaleDateString()}</Text>
+                      </View>
+                      <View style={styles.stars}>
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star key={s} size={10} color={s <= rev.rating ? COLORS.accentGold : 'rgba(255,255,255,0.1)'} fill={s <= rev.rating ? COLORS.accentGold : 'transparent'} />
+                        ))}
+                      </View>
+                    </View>
+                    <Text style={styles.reviewComment}>"{rev.comment}"</Text>
+                  </View>
+                ))
+              ) : (
+                <View style={styles.noReviews}>
+                  <Text style={styles.noReviewsText}>No testimonials yet for this masterpiece.</Text>
+                </View>
+              )}
+            </View>
+
+            {/* Add Review Form */}
+            <View style={styles.reviewForm}>
+              <Text style={styles.formTitle}>Share Your <Text style={styles.italicGold}>Impression</Text></Text>
+              
+              <View style={styles.ratingPicker}>
+                <Text style={styles.pickerLabel}>Select Rating</Text>
+                <View style={styles.pickerStars}>
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <TouchableOpacity key={s} onPress={() => setRating(s)}>
+                      <Star size={24} color={s <= rating ? COLORS.accentGold : 'rgba(255,255,255,0.1)'} fill={s <= rating ? COLORS.accentGold : 'transparent'} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.pickerLabel}>Your Commentary</Text>
+                <TextInput
+                  style={styles.commentInput}
+                  value={comment}
+                  onChangeText={setComment}
+                  placeholder="Describe the olfactory journey..."
+                  placeholderTextColor="rgba(255,255,255,0.2)"
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
+
+              <TouchableOpacity 
+                style={[styles.postBtn, submittingReview && { opacity: 0.5 }]} 
+                onPress={handleReviewSubmit}
+                disabled={submittingReview}
+              >
+                <Text style={styles.postBtnText}>{submittingReview ? 'Posting...' : 'Post Testimonial'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
+
       </ScrollView>
 
       {/* Bottom Bar */}
@@ -522,6 +644,116 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textTransform: 'uppercase',
   },
+  reviewsSection: {
+    marginTop: SPACING.xxl,
+    paddingTop: SPACING.xxl,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.05)',
+  },
+  reviewList: {
+    marginBottom: SPACING.xxl,
+  },
+  reviewCard: {
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: SPACING.md,
+  },
+  reviewerName: {
+    color: COLORS.white,
+    fontFamily: FONTS.bodyBold,
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  reviewDate: {
+    color: COLORS.textMuted,
+    fontFamily: FONTS.body,
+    fontSize: 9,
+    marginTop: 2,
+  },
+  reviewComment: {
+    color: 'rgba(255,255,255,0.7)',
+    fontFamily: FONTS.body,
+    fontSize: 13,
+    lineHeight: 20,
+    fontStyle: 'italic',
+  },
+  noReviews: {
+    paddingVertical: 40,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  noReviewsText: {
+    color: COLORS.textMuted,
+    fontFamily: FONTS.body,
+    fontSize: 10,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  reviewForm: {
+    backgroundColor: 'rgba(255,255,255,0.01)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+    padding: SPACING.xl,
+  },
+  formTitle: {
+    color: COLORS.white,
+    fontFamily: FONTS.display,
+    fontSize: 20,
+    marginBottom: SPACING.xl,
+  },
+  ratingPicker: {
+    marginBottom: SPACING.xl,
+  },
+  pickerLabel: {
+    color: 'rgba(255,255,255,0.4)',
+    fontFamily: FONTS.bodyBold,
+    fontSize: 9,
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+    marginBottom: 12,
+  },
+  pickerStars: {
+    flexDirection: 'row',
+    gap: 15,
+  },
+  inputGroup: {
+    marginBottom: SPACING.xl,
+  },
+  commentInput: {
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    padding: SPACING.md,
+    color: COLORS.white,
+    fontFamily: FONTS.body,
+    fontSize: 14,
+    height: 100,
+  },
+  postBtn: {
+    backgroundColor: COLORS.white,
+    height: 52,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  postBtnText: {
+    color: COLORS.black,
+    fontFamily: FONTS.bodyBold,
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+  },
 });
+
 
 export default ProductDetailsScreen;

@@ -100,7 +100,7 @@ const ProductDetails = () => {
     e.preventDefault();
     if (!user) {
       toast.error('Please sign in to leave a review');
-      navigate('/auth');
+      navigate('/login');
       return;
     }
 
@@ -111,11 +111,12 @@ const ProductDetails = () => {
 
     setSubmittingReview(true);
     try {
-      if (product.isFragranceStore) {
-        await createFragranceReview(product._id || id, { rating, comment });
-      } else {
-        await createReview(id, { rating, comment });
-      }
+      // Unify review submission - the backend now handles both standard and fragrance store products
+      const { data: reviewResponse } = await createReview(id, { 
+        rating, 
+        comment, 
+        productInfo: product // Pass the full product object to handle auto-creation if needed
+      });
       
       toast.success('Review submitted successfully!', {
         style: {
@@ -133,18 +134,14 @@ const ProductDetails = () => {
       setComment('');
       setRating(5);
       
-      // Refresh product data
-      if (product.isFragranceStore) {
-        const { data } = await getStoredFragrance(product._id || id);
-        setProduct({
-          ...product,
-          reviews: data.reviews,
-          numReviews: data.numReviews,
-          rating: data.rating
-        });
-      } else {
-        const { data } = await getProduct(id);
-        setProduct(data);
+      // Refresh product data using the ID returned by the backend (which will be a valid MongoID)
+      const targetId = reviewResponse.productId || id;
+      const { data } = await getProduct(targetId);
+      setProduct(data);
+      
+      // If the ID changed (because it was newly created), navigate to the new ID
+      if (reviewResponse.productId && reviewResponse.productId !== id) {
+        navigate(`/product/${reviewResponse.productId}`, { replace: true });
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Error submitting review');
@@ -152,6 +149,7 @@ const ProductDetails = () => {
       setSubmittingReview(false);
     }
   };
+
 
 
   if (loading) return <Loading fullPage />;

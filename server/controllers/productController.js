@@ -139,8 +139,49 @@ exports.getBrands = async (req, res) => {
 // @route   POST /api/products/:id/reviews
 exports.createProductReview = async (req, res) => {
   try {
-    const { rating, comment } = req.body;
-    const product = await Product.findById(req.params.id);
+    const { rating, comment, productInfo } = req.body;
+    const { id } = req.params;
+    
+    let product;
+    
+    // Check if ID is a valid MongoDB ObjectID
+    const isMongoId = id.match(/^[0-9a-fA-F]{24}$/);
+    
+    if (isMongoId) {
+      product = await Product.findById(id);
+    } else {
+      // If not a MongoID, search by name/brand combination from productInfo
+      product = await Product.findOne({
+        $or: [
+          { name: productInfo?.name, brand: productInfo?.brand },
+          { name: productInfo?.Name, brand: productInfo?.Brand }
+        ]
+      });
+    }
+
+    // If product doesn't exist in our DB, create it from provided info
+    if (!product && productInfo) {
+      // Normalize category to match enum: ['Men', 'Women', 'Unisex']
+      let category = 'Unisex';
+      const rawCategory = (productInfo.category || productInfo.Gender || '').toLowerCase();
+      if (rawCategory.includes('men') && !rawCategory.includes('women')) {
+        category = 'Men';
+      } else if (rawCategory.includes('women')) {
+        category = 'Women';
+      }
+
+      product = await Product.create({
+        name: productInfo.name || productInfo.Name,
+        brand: productInfo.brand || productInfo.Brand,
+        description: productInfo.description || productInfo.Description || 'Fragrance profile from explorer',
+        price: Number(productInfo.price || productInfo.Price) || 0,
+        image: productInfo.image || productInfo['Image URL'],
+        category,
+        volume: productInfo.volume || '100ml',
+        stock: 50,
+      });
+    }
+
 
     if (product) {
       const alreadyReviewed = product.reviews.find(
@@ -169,22 +210,36 @@ exports.createProductReview = async (req, res) => {
       // Emit real-time review update
       try {
         const io = socketIO.getIO();
-        io.to(`product-${req.params.id}`).emit('new-review', {
-          productId: req.params.id,
-          review: product.reviews[product.reviews.length - 1],
-          numReviews: product.numReviews,
-          rating: product.rating
+        // Emit to both original ID and MongoDB ID rooms
+        const rooms = [`product-${product._id}`];
+        if (id !== product._id.toString()) {
+          rooms.push(`product-${id}`);
+        }
+        
+        rooms.forEach(room => {
+          io.to(room).emit('new-review', {
+            productId: id, // Original ID from request
+            mongoProductId: product._id, // Actual DB ID
+            review: product.reviews[product.reviews.length - 1],
+            numReviews: product.numReviews,
+            rating: product.rating
+          });
         });
       } catch (err) {
+
         console.error('Socket error in review:', err.message);
       }
 
-      res.status(201).json({ message: 'Review added' });
+      res.status(201).json({ 
+        message: 'Review added', 
+        productId: product._id // Return the actual DB ID
+      });
     } else {
-      res.status(404).json({ message: 'Product not found' });
+      res.status(404).json({ message: 'Product not found and no info provided for creation' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
