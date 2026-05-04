@@ -30,8 +30,10 @@ const Checkout = () => {
           name: item.name,
           image: item.image,
           price: item.price,
-          quantity: item.quantity
+          quantity: item.quantity,
+          productInfo: item // Send full info for auto-import if needed
         })),
+
         shippingAddress: formData,
         paymentMethod: paymentMethod === 'bog' ? 'Bank of Georgia' : 'Card',
         totalPrice: totalPrice

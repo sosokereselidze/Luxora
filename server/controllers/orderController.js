@@ -6,18 +6,67 @@ const socketIO = require('../socket');
 exports.createOrder = async (req, res) => {
   try {
     const { items, shippingAddress, paymentMethod, totalPrice } = req.body;
+    const Product = require('../models/Product');
 
     if (!items || items.length === 0) {
       return res.status(400).json({ message: 'No order items' });
     }
 
+    // Process items to ensure they exist in local DB and handle stock
+    const processedItems = [];
+    for (const item of items) {
+      let product = await Product.findById(item.product);
+      
+      // If product not found by ID, it might be an external product being bought for the first time
+      if (!product && item.productInfo) {
+        // Normalize category
+        let category = 'Unisex';
+        const rawCategory = (item.productInfo.category || item.productInfo.Gender || '').toLowerCase();
+        if (rawCategory.includes('men') && !rawCategory.includes('women')) category = 'Men';
+        else if (rawCategory.includes('women')) category = 'Women';
+
+        product = await Product.create({
+          name: item.productInfo.name || item.productInfo.Name,
+          brand: item.productInfo.brand || item.productInfo.Brand,
+          description: item.productInfo.description || item.productInfo.Description || 'Purchased from explorer',
+          price: Number(item.productInfo.price || item.productInfo.Price) || item.price,
+          image: item.productInfo.image || item.productInfo['Image URL'] || item.image,
+          category,
+          volume: item.productInfo.volume || '100ml',
+          stock: 49, // Starting with 50, but we're buying one now
+        });
+      }
+
+      if (product) {
+        // Decrement stock
+        product.stock = Math.max(0, product.stock - item.quantity);
+        product.sold = (product.sold || 0) + item.quantity;
+        await product.save();
+
+        processedItems.push({
+          product: product._id,
+          name: product.name,
+          image: product.image,
+          price: product.price,
+          quantity: item.quantity
+        });
+      } else {
+        // If still no product and no info, we might have to skip or error
+        // For now, if it has a valid-looking name/price, we skip the DB check for the order item
+        // but the Order model requires a valid ObjectId, so this would fail anyway.
+        // So we'll return an error if we can't find/create it.
+        return res.status(404).json({ message: `Product ${item.name} not found and cannot be initialized.` });
+      }
+    }
+
     const order = await Order.create({
       user: req.user._id,
-      items,
+      items: processedItems,
       shippingAddress,
       paymentMethod,
       totalPrice
     });
+
 
     // Notify Admins
     try {

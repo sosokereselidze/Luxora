@@ -49,11 +49,13 @@ const AppInner = () => {
 
   // If user is admin and NOT on an admin page, force them to the admin dashboard
   // This ensures admins only see the admin platform.
-  useEffect(() => {
-    if (!loading && user && user.role === 'admin' && !isAdminPage) {
-      navigate('/admin');
-    }
-  }, [user, loading, isAdminPage, navigate, location.pathname]);
+  // Removed forced admin redirection to allow admins to view the storefront
+  // useEffect(() => {
+  //   if (!loading && user && user.role === 'admin' && !isAdminPage) {
+  //     navigate('/admin');
+  //   }
+  // }, [user, loading, isAdminPage, navigate, location.pathname]);
+
 
   if (loading) return null;
 

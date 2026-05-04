@@ -79,8 +79,10 @@ const ProductDetails = () => {
             topNotes: data.topNotes || data['Top Notes'] || [],
             middleNotes: data.middleNotes || data['Middle Notes'] || data['Heart Notes'] || [],
             baseNotes: data.baseNotes || data['Base Notes'] || [],
+            _id: data.id, // Map external id to _id for cart/checkout consistency
             isFragranceStore: true
           };
+
         }
         setProduct(responseData);
       } catch (error) {

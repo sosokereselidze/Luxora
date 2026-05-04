@@ -75,8 +75,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         middleNotes: data.middleNotes || [],
         baseNotes: data.baseNotes || [],
         accords: data.accords || [],
-        reviews: data.reviews || []
+        reviews: data.reviews || [],
+        _id: data._id || data.id // Map external id to _id
       });
+
     } catch (error) {
       console.error('Error fetching product details:', error);
     } finally {
