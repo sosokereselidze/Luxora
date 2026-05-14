@@ -59,32 +59,27 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        let responseData;
-        try {
-          const { data } = await getProduct(id);
-          responseData = data;
-        } catch (e) {
-          // Fallback to Fragrance Store
-          const { data } = await getStoredFragrance(id);
-          // Map Fragrance data to show in ProductDetails
-          responseData = {
-            ...data,
-            category: data.category || 'Fragrance',
-            stock: 100, // API products don't have stock, default to available
-            numReviews: data.numReviews || 0,
-            volume: '100ml', // Default volume
-            Longevity: data.Longevity || data['Image Longevity'],
-            Sillage: data.Sillage || data['Image Sillage'],
-            accords: data.accords || data['Main Accords'] || [],
-            topNotes: data.topNotes || data['Top Notes'] || [],
-            middleNotes: data.middleNotes || data['Middle Notes'] || data['Heart Notes'] || [],
-            baseNotes: data.baseNotes || data['Base Notes'] || [],
-            _id: data.id, // Map external id to _id for cart/checkout consistency
-            isFragranceStore: true
-          };
-
+        const { data } = await getProduct(id);
+        
+        // If it's a fragrance from the Fragrance collection, ensure all UI fields are mapped
+        if (data.id && !data._id) {
+           data._id = data.id;
         }
-        setProduct(responseData);
+
+        // Map notes if they are in the external format (from fragrance store)
+        const mappedProduct = {
+          ...data,
+          category: data.category || 'Fragrance',
+          stock: data.stock || 100,
+          numReviews: data.numReviews || 0,
+          volume: data.volume || '100ml',
+          accords: data.accords || data['Main Accords'] || [],
+          topNotes: data.topNotes || data['Top Notes'] || [],
+          middleNotes: data.middleNotes || data['Middle Notes'] || data['Heart Notes'] || [],
+          baseNotes: data.baseNotes || data['Base Notes'] || []
+        };
+
+        setProduct(mappedProduct);
       } catch (error) {
         console.error('Error fetching product:', error);
       } finally {
@@ -345,7 +340,7 @@ const ProductDetails = () => {
             <div className="flex flex-wrap gap-x-8 gap-y-4 text-[0.55rem] uppercase tracking-[0.15em] mt-auto pt-6 border-t border-white/5">
               <p className="flex items-center gap-2 font-bold text-white/30"><span className="text-white/60">Category:</span> {product.category}</p>
               <p className="flex items-center gap-2 font-bold text-white/30"><span className="text-white/60">Stock:</span> {product.stock > 10 ? 'Available' : product.stock > 0 ? `Only ${product.stock} left` : 'Sold Out'}</p>
-              <p className="flex items-center gap-2 font-bold text-white/30"><span className="text-white/60">SKU:</span> LX-{(product._id || product.id).slice(-6).toUpperCase()}</p>
+              <p className="flex items-center gap-2 font-bold text-white/30"><span className="text-white/60">SKU:</span> LX-{((product._id || product.id)?.toString() || '000000').slice(-6).toUpperCase()}</p>
             </div>
           </div>
         </div>

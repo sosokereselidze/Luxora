@@ -72,12 +72,27 @@ exports.getProducts = async (req, res) => {
 // @route   GET /api/products/:id
 exports.getProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    let product = await Product.findById(req.params.id);
+    
+    // Fallback to Fragrance collection if not found in Product collection
+    if (!product) {
+      const Fragrance = require('../models/Fragrance');
+      product = await Fragrance.findById(req.params.id);
+    }
+
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
     res.json(product);
   } catch (error) {
+    // If it's a CastError (invalid ID), try searching Fragrance collection by its custom 'id'
+    if (error.name === 'CastError') {
+      try {
+        const Fragrance = require('../models/Fragrance');
+        const fragrance = await Fragrance.findOne({ id: req.params.id });
+        if (fragrance) return res.json(fragrance);
+      } catch (e) {}
+    }
     res.status(500).json({ message: error.message });
   }
 };
