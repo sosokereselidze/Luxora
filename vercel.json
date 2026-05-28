@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "installCommand": "npm install && cd server && npm install && cd ../web && npm install",
   "builds": [
     {
       "src": "server/server.js",
@@ -23,11 +24,15 @@
       "dest": "server/server.js"
     },
     {
+      "src": "/assets/(.*)",
+      "dest": "web/dist/assets/$1"
+    },
+    {
       "handle": "filesystem"
     },
     {
-      "src": "/.*",
-      "dest": "web/index.html"
+      "src": "/(.*)",
+      "dest": "web/dist/index.html"
     }
   ]
 }

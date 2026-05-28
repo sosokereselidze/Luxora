@@ -54,6 +54,9 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
+
+// Vercel runs Express as a serverless function; do not bind a port there.
+if (!process.env.VERCEL) {
 httpServer.listen(PORT, async () => {
   console.log(`🚀 Luxora Server running on port ${PORT}`);
   console.log(`📡 API: http://localhost:${PORT}/api`);
@@ -90,5 +93,6 @@ httpServer.listen(PORT, async () => {
     console.error('⚠️  Admin user setup error:', err.message);
   }
 });
+}
 
 module.exports = app;
