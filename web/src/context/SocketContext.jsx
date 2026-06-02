@@ -12,6 +12,13 @@ export const SocketProvider = ({ children }) => {
     // Use relative path to leverage Vite's proxy in development, or VITE_API_URL in production
     const URL = import.meta.env.MODE === 'development' ? window.location.origin : (import.meta.env.VITE_API_URL || window.location.origin);
     
+    // Disable socket on Vercel deployments (Vercel serverless doesn't support persistent WebSockets)
+    if (URL.includes('vercel.app')) {
+      console.log('ℹ️ Socket.io disabled: Vercel serverless environment does not support WebSockets.');
+      setSocket(null);
+      return;
+    }
+
     const newSocket = io(URL, {
       withCredentials: true,
       transports: ['websocket', 'polling']
